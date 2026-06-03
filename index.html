@@ -421,7 +421,7 @@
 // ══════════════════════════════════════
 let db;
 const DB_NAME = 'CatNonHelperDB';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 function initDB() {
   return new Promise((resolve, reject) => {
@@ -434,8 +434,9 @@ function initDB() {
       }
       if (!d.objectStoreNames.contains('albums'))
         d.createObjectStore('albums',{keyPath:'id',autoIncrement:true});
-      if (!d.objectStoreNames.contains('homework'))
-        d.createObjectStore('homework',{keyPath:'id',autoIncrement:true});
+      // v4: remove orphaned homework store from old schedule system
+      if (d.objectStoreNames.contains('homework'))
+        d.deleteObjectStore('homework');
       if (!d.objectStoreNames.contains('notes'))
         d.createObjectStore('notes',{keyPath:'id',autoIncrement:true});
     };
