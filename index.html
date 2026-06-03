@@ -76,8 +76,6 @@
   .note-editor::placeholder{color:var(--text-dimmer);}
 
   /* BACKTRACKER */
-  #screen-backtracker{display:none;flex-direction:column;height:100vh;}
-  #screen-backtracker.active{display:flex;}
   .tracker-controls{padding:16px 20px 12px;background:var(--bg);display:flex;flex-direction:column;gap:10px;z-index:10;}
   .tracker-title{font-size:26px;font-weight:600;color:var(--accent);letter-spacing:-0.5px;}
   #track-btn{width:100%;padding:14px;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:background 0.2s,transform 0.1s;}
@@ -681,8 +679,7 @@ async function renderNotes() {
     </div>`; return;
   }
   grid.innerHTML = notes.map(n=>{
-    const preview = (n.body||'').trim().split('
-').slice(0,2).join(' ').slice(0,120);
+    const preview = (n.body||'').trim().split('\n').slice(0,2).join(' ').slice(0,120);
     const date = new Date(n.updated).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     return `<div class="note-card" onclick="openNote(${n.id})">
       <div class="note-card-header">
@@ -783,8 +780,16 @@ async function confirmDeleteNote() {
 let map=null, trackLine=null, trackCoords=[], watchId=null, isTracking=false, mapInited=false;
 
 function initMap() {
-  if (mapInited) { map.invalidateSize(); return; }
-  mapInited=true;
+  if (typeof L === 'undefined') {
+    // Leaflet not loaded yet — retry once it's available
+    setTimeout(initMap, 200);
+    return;
+  }
+  if (mapInited) {
+    if (map) map.invalidateSize();
+    return;
+  }
+  mapInited = true;
   map = L.map('map',{zoomControl:true,attributionControl:false});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
   trackLine = L.polyline([],{color:'#4a9eff',weight:4,opacity:0.9}).addTo(map);
