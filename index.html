@@ -460,9 +460,6 @@ let currentPhotoId = null;
 let lightboxInAlbum = false;
 let pendingFiles = [];
 let editingAlbumId = null;
-let deletingHomeworkId = null;
-let settingsHomeworkId = null;
-let notifState = {day:false,deadline:false,custom:false,customTime:null};
 
 // ══════════════════════════════════════
 //  NAVIGATION
@@ -479,6 +476,7 @@ function showScreen(name, albumId=null) {
   document.querySelector('.bottom-nav').style.display=hideNav.includes(name)?'none':'';
   if (name==='pictures') renderAlbums();
   if (name==='notes') renderNotes();
+  if (name==='upload') initUploadScreen();
   if (name==='backtracker') initMap();
   if (name==='album-detail' && albumId!==null) openAlbum(albumId);
 }
@@ -780,192 +778,6 @@ async function confirmDeleteNote() {
 }
 
 // ══════════════════════════════════════
-//  UPLOAD// ══════════════════════════════════════
-//  UPLOAD
-// ══════════════════════════════════════
-async function initUploadScreen() {
-  const albums=await dbGetAll('albums');
-  const sel=document.getElementById('upload-album-select');
-  sel.innerHTML='<option value="">Uncategorized</option>'+albums.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
-  pendingFiles=[];
-  document.getElementById('upload-preview').style.display='none';
-  document.getElementById('upload-preview').innerHTML='';
-  document.getElementById('upload-btn').disabled=true;
-}
-
-function handleFileSelect(e) {
-  const files=Array.from(e.target.files);
-  if (!files.length) return;
-  pendingFiles.push(...files);renderUploadPreviews();e.target.value='';
-}
-function renderUploadPreviews() {
-  const preview=document.getElementById('upload-preview');
-  if (!pendingFiles.length){preview.style.display='none';preview.innerHTML='';document.getElementById('upload-btn').disabled=true;return;}
-  preview.style.display='grid';
-  preview.innerHTML=pendingFiles.map((f,i)=>{
-    const url=URL.createObjectURL(f);
-    return `<div class="upload-preview-item"><img src="${url}" alt=""><button class="remove-preview" onclick="removePendingFile(${i})">×</button></div>`;
-  }).join('');
-  document.getElementById('upload-btn').disabled=false;
-}
-function removePendingFile(i){pendingFiles.splice(i,1);renderUploadPreviews();}
-
-async function uploadPhotos() {
-  if (!pendingFiles.length) return;
-  const albumId=document.getElementById('upload-album-select').value;
-  const albumIdNum=albumId?parseInt(albumId):null;
-  let albumName=null;
-  if (albumIdNum){const a=await dbGet('albums',albumIdNum);albumName=a?a.name:null;}
-  document.getElementById('loading').classList.add('show');
-  for (const file of pendingFiles) {
-    const dataUrl=await fileToDataUrl(file);
-    await dbAdd('photos',{name:file.name,dataUrl,albumId:albumIdNum,albumName,date:Date.now()});
-  }
-  document.getElementById('loading').classList.remove('show');
-  showToast(`${pendingFiles.length} photo${pendingFiles.length>1?'s':''} saved`);
-  pendingFiles=[];showScreen('pictures');
-}
-function fileToDataUrl(f){return new Promise(r=>{const rd=new FileReader();rd.onload=e=>r(e.target.result);rd.readAsDataURL(f);});}
-
-const uploadBox=document.getElementById('upload-box');
-uploadBox.addEventListener('dragover',e=>{e.preventDefault();uploadBox.classList.add('drag-over');});
-uploadBox.addEventListener('dragleave',()=>uploadBox.classList.remove('drag-over'));
-uploadBox.addEventListener('drop',e=>{e.preventDefault();uploadBox.classList.remove('drag-over');const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));pendingFiles.push(...files);renderUploadPreviews();});
-
-// ══════════════════════════════════════
-//  SCHEDULE
-// ══════════════════════════════════════
-async function renderSchedule() {
-  const items=await dbGetAll('homework');
-  const now=Date.now();
-  items.sort((a,b)=>a.deadline-b.deadline);
-  const bannerWrap=document.getElementById('notif-banner-wrap');
-  if (Notification.permission==='default')
-    bannerWrap.innerHTML=`<div class="notif-banner">🔔 Allow notifications to get deadline reminders. <span onclick="requestNotifPermission()" style="color:var(--accent);cursor:pointer;font-weight:600;"> Enable</span></div>`;
-  else if (Notification.permission==='denied')
-    bannerWrap.innerHTML=`<div class="notif-banner">⚠️ Notifications blocked. Enable them in browser settings.</div>`;
-  else bannerWrap.innerHTML='';
-
-  const list=document.getElementById('schedule-list');
-  if (!items.length){list.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><h3>No homework</h3><p>Tap + to add a homework deadline.</p></div>`;return;}
-
-  list.innerHTML=items.map(hw=>{
-    const d=new Date(hw.deadline),diff=hw.deadline-now,hours=diff/3600000;
-    let cardClass='',badgeClass='',badgeText='';
-    if(diff<0){cardClass='overdue';badgeClass='overdue';badgeText='Overdue';}
-    else if(hours<24){cardClass='soon';badgeClass='soon';badgeText='Due soon';}
-    else{badgeClass='ok';const days=Math.floor(hours/24);badgeText=`${days} day${days!==1?'s':''} left`;}
-    const day=d.getDate(),month=d.toLocaleDateString('en-US',{month:'short'});
-    const time=d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
-    const reminders=[];
-    if(hw.notifDay)reminders.push('1d before');
-    if(hw.notifDeadline)reminders.push('at deadline');
-    if(hw.notifCustom&&hw.notifCustomTime){const cd=new Date(hw.notifCustomTime);reminders.push(cd.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+cd.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}));}
-    const reminderText=reminders.length?`<div style="font-size:11px;color:var(--text-dimmer);margin-top:5px;">🔔 ${reminders.join(' · ')}</div>`:'';
-    const gear=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
-    const trash=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
-    const safeName=hw.name.replace(/'/g,"\\'");
-    return `<div class="hw-card ${cardClass}" id="hwcard-${hw.id}">
-      <div class="hw-collapsed" onclick="toggleHwCard(${hw.id})">
-        <div class="hw-dot ${badgeClass}"></div>
-        <div class="hw-collapsed-name">${hw.name}</div>
-        <div class="hw-collapsed-time">${time} · ${month} ${day}</div>
-        <div class="hw-collapsed-actions">
-          <button class="hw-action-btn" onclick="event.stopPropagation();openNotifSettings(${hw.id})">${gear}</button>
-        </div>
-        <svg class="hw-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <div class="hw-expanded">
-        <div class="hw-detail-row">
-          <div class="hw-deadline-block">
-            <div class="hw-deadline-day">${day}</div>
-            <div class="hw-deadline-month">${month}</div>
-            <div class="hw-deadline-time">${time}</div>
-          </div>
-          <div class="hw-body">
-            <div class="hw-name">${hw.name}</div>
-            ${hw.desc?`<div class="hw-desc">${hw.desc}</div>`:''}
-            <span class="hw-badge ${badgeClass}">${badgeText}</span>
-            ${reminderText}
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function toggleHwCard(id) {
-  const card = document.getElementById('hwcard-'+id);
-  if (card) card.classList.toggle('expanded');
-}
-
-
-function openAddHomeworkModal() {
-  document.getElementById('hw-name-input').value='';
-  document.getElementById('hw-desc-input').value='';
-  const t=new Date();t.setDate(t.getDate()+1);t.setHours(12,0,0,0);
-  document.getElementById('hw-datetime-input').value=toLocalDatetimeInput(t);
-  openModal('modal-homework');
-  setTimeout(()=>document.getElementById('hw-name-input').focus(),200);
-}
-function toLocalDatetimeInput(d){const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;}
-
-async function confirmHomework() {
-  const name=document.getElementById('hw-name-input').value.trim();
-  if(!name){showToast('Enter a homework name');return;}
-  const val=document.getElementById('hw-datetime-input').value;
-  if(!val){showToast('Pick a deadline');return;}
-  const deadline=new Date(val).getTime();
-  const desc=document.getElementById('hw-desc-input').value.trim();
-  await dbAdd('homework',{name,desc,deadline,created:Date.now(),notifDay:false,notifDeadline:false,notifCustom:false,notifCustomTime:null,firedDay:false,firedDeadline:false,firedCustom:false});
-  closeModal('modal-homework');showToast('Homework added');renderSchedule();
-}
-function deleteFromSettings(){
-  closeModal('modal-hw-settings');
-  const hw_id = settingsHomeworkId;
-  const hw_name = document.getElementById('settings-hw-name').textContent;
-  askDeleteHomework(hw_id, hw_name);
-}
-
-function askDeleteHomework(id,name){deletingHomeworkId=id;document.getElementById('hw-delete-name').textContent=name;openModal('modal-hw-delete');}
-async function confirmDeleteHomework(){await dbDelete('homework',deletingHomeworkId);closeModal('modal-hw-delete');showToast('Removed');renderSchedule();}
-
-async function openNotifSettings(hwId) {
-  settingsHomeworkId=hwId;
-  const hw=await dbGet('homework',hwId);
-  document.getElementById('settings-hw-name').textContent=hw.name;
-  notifState={day:hw.notifDay||false,deadline:hw.notifDeadline||false,custom:hw.notifCustom||false,customTime:hw.notifCustomTime||null};
-  updateNotifCheckboxes();
-  const baseTime=notifState.customTime?new Date(notifState.customTime):new Date(hw.deadline-3600000);
-  document.getElementById('custom-notif-datetime').value=toLocalDatetimeInput(baseTime);
-  document.getElementById('custom-datetime-wrap').classList.toggle('show',notifState.custom);
-  openModal('modal-hw-settings');
-}
-function toggleNotifOption(k){notifState[k]=!notifState[k];updateNotifCheckboxes();if(k==='custom')document.getElementById('custom-datetime-wrap').classList.toggle('show',notifState.custom);}
-function updateNotifCheckboxes(){['day','deadline','custom'].forEach(k=>document.getElementById(`chk-${k}`).classList.toggle('checked',notifState[k]));}
-async function saveNotifSettings() {
-  const hw=await dbGet('homework',settingsHomeworkId);
-  hw.notifDay=notifState.day;hw.notifDeadline=notifState.deadline;hw.notifCustom=notifState.custom;
-  if(notifState.custom){const v=document.getElementById('custom-notif-datetime').value;hw.notifCustomTime=v?new Date(v).getTime():null;}else hw.notifCustomTime=null;
-  hw.firedDay=false;hw.firedDeadline=false;hw.firedCustom=false;
-  await dbPut('homework',hw);closeModal('modal-hw-settings');showToast('Reminders saved');renderSchedule();
-  if((hw.notifDay||hw.notifDeadline||hw.notifCustom)&&Notification.permission==='default')requestNotifPermission();
-}
-async function requestNotifPermission(){const r=await Notification.requestPermission();showToast(r==='granted'?'Notifications enabled':'Notifications blocked');renderSchedule();}
-async function checkNotifications() {
-  if(Notification.permission!=='granted')return;
-  const items=await dbGetAll('homework');const now=Date.now();
-  for(const hw of items){
-    let changed=false;
-    if(hw.notifDay&&!hw.firedDay&&now>=hw.deadline-86400000){new Notification('Incoming deadline',{body:hw.name,icon:'icon.png'});hw.firedDay=true;changed=true;}
-    if(hw.notifDeadline&&!hw.firedDeadline&&now>=hw.deadline){new Notification('Incoming deadline',{body:hw.name,icon:'icon.png'});hw.firedDeadline=true;changed=true;}
-    if(hw.notifCustom&&hw.notifCustomTime&&!hw.firedCustom&&now>=hw.notifCustomTime){new Notification('Incoming deadline',{body:hw.name,icon:'icon.png'});hw.firedCustom=true;changed=true;}
-    if(changed)await dbPut('homework',hw);
-  }
-}
-
-
-// ══════════════════════════════════════
 //  BACKTRACKER
 // ══════════════════════════════════════
 let map=null, trackLine=null, trackCoords=[], watchId=null, isTracking=false, mapInited=false;
@@ -1119,23 +931,17 @@ function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 document.getElementById('album-name-input').addEventListener('keydown',e=>{if(e.key==='Enter')confirmAlbum();});
-document.getElementById('hw-name-input').addEventListener('keydown',e=>{if(e.key==='Enter')confirmHomework();});
 
 let toastTimer;
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
 
-// patch showScreen for upload
-const _origShowScreen=showScreen;
-window.showScreen=function(name,albumId=null){
-  if(name==='upload')initUploadScreen();
-  _origShowScreen(name,albumId);
-};
+// upload init handled in showScreen directly
 
 // SW
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 // INIT
-initDB().then(()=>{showScreen('pictures');checkNotifications();}).catch(()=>{
+initDB().then(()=>{showScreen('pictures');}).catch(()=>{
   document.body.innerHTML='<div style="padding:40px;color:#ff4a4a;font-family:sans-serif;">Failed to initialize. Please use Chrome.</div>';
 });
 </script>
