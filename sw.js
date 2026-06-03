@@ -1,4 +1,4 @@
-const CACHE_NAME = 'catnon-helper-v1';
+const CACHE_NAME = 'catnon-helper-v2';
 const PRECACHE = [
   './',
   './index.html',
@@ -10,36 +10,56 @@ const PRECACHE = [
 ];
 
 self.addEventListener('install', e => {
+  // Take over immediately without waiting for old SW to release
   e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(PRECACHE))
+      .then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener('activate', e => {
-  // Remove old caches from previous versions
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    ).then(() => clients.claim())
+      // Wipe ALL old caches, not just ones with different names
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => {
+        console.log('[SW] Deleting old cache:', k);
+        return caches.delete(k);
+      }))
+    ).then(() => {
+      console.log('[SW] Now controlling all clients');
+      return clients.claim(); // take over all open tabs immediately
+    })
   );
 });
 
 self.addEventListener('fetch', e => {
-  // Only handle GET requests; skip non-http(s) schemes
   if (e.request.method !== 'GET' || !e.request.url.startsWith('http')) return;
+
+  // Network-first for the main document — always get the freshest index.html
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request)
+        .then(response => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+          return response;
+        })
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // Cache-first for everything else (scripts, styles, fonts, tiles)
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
       return fetch(e.request).then(response => {
-        // Cache valid responses (skip opaque/error)
         if (response && response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
         }
         return response;
-      }).catch(() => {
-        // Fallback for navigate requests when offline
-        if (e.request.mode === 'navigate') return caches.match('./index.html');
       });
     })
   );
