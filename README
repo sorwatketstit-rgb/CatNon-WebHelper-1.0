@@ -1,0 +1,97 @@
+# CatNon School Helper
+
+A lightweight, offline-capable PWA (Progressive Web App) for students. Stores all data locally on the device — no account or internet connection required after the first load.
+
+---
+
+## Files
+
+| File | Description |
+|------|-------------|
+| `index.html` | Main app — all UI, logic, and styles in one file |
+| `sw.js` | Service worker — enables offline use and asset caching |
+| `manifest.json` | PWA manifest — allows "Add to Home Screen" on mobile |
+| `icon.png` | App icon (512×512) |
+
+---
+
+## Features
+
+### 📷 Pictures
+- Organize photos into named albums
+- Upload multiple photos at once (tap or drag & drop)
+- Assign photos to albums on upload, or move them later
+- Albums have a custom sort order (lower number = shown first)
+- Uncategorized album collects any photos not assigned to a folder
+- Tap any photo to open a full-screen lightbox
+- Delete or move photos from the lightbox options menu
+
+### 📝 Notes
+- Create and edit freeform text notes
+- Notes auto-save while typing (800ms debounce)
+- Rename or delete notes from the gear icon on each card
+- Notes are sorted by last modified date
+
+### 🗺️ Backtracker
+- Records your GPS path as a polyline on a live map (OpenStreetMap)
+- Start / Stop tracking with one button
+- Snap-to-location button recenters the map on your current position
+- Reset button clears the recorded path
+- Compass overlay shows device heading (requires device orientation permission on iOS)
+
+---
+
+## Data Storage
+
+All data is stored in the browser's **IndexedDB** under the database `CatNonHelperDB`. Nothing is sent to any server.
+
+| Store | Contents |
+|-------|----------|
+| `photos` | Photo entries with base64 image data, album assignment, and date |
+| `albums` | Album names, sort order, and creation date |
+| `notes` | Note title, body, and timestamps |
+
+Current DB version: **4**
+
+> Clearing browser site data or using a different browser will erase all stored content. There is no cloud backup.
+
+---
+
+## Offline Support
+
+The service worker (`sw.js`) caches the app shell on first load, including:
+- `index.html`
+- `manifest.json`
+- Leaflet map library (CSS + JS)
+- Google Fonts
+
+After the first visit the app works fully offline, except for map tiles (those require a connection to load new areas).
+
+---
+
+## Installation (Add to Home Screen)
+
+**Android (Chrome):**
+1. Open the app in Chrome
+2. Tap the three-dot menu → "Add to Home screen"
+3. Confirm — the app will appear as a standalone icon
+
+**iOS (Safari):**
+1. Open the app in Safari
+2. Tap the Share button → "Add to Home Screen"
+3. Confirm — the app opens without browser UI
+
+---
+
+## Browser Compatibility
+
+Requires a modern browser with IndexedDB support. Chrome is recommended. Safari works but requires user permission for device orientation (compass feature).
+
+---
+
+## Known Limitations
+
+- Photos are stored as base64 in IndexedDB — large photo libraries may hit browser storage limits
+- Map tiles do not cache offline (only the map library itself is cached)
+- No export or backup functionality
+- Single-user, single-device only
