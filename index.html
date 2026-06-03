@@ -88,9 +88,11 @@
   #snap-btn{position:absolute;top:12px;right:12px;z-index:1000;width:38px;height:38px;background:rgba(20,20,20,0.9);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,0.4);}
   #snap-btn:active{background:var(--surface2);}
   #snap-btn svg{width:18px;height:18px;}
-  #reset-text{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:1000;font-size:12px;color:var(--text-dimmer);text-decoration:underline;cursor:pointer;background:rgba(10,10,10,0.6);padding:4px 10px;border-radius:20px;white-space:nowrap;}
-  #reset-text:active{color:var(--text-dim);}
-  #compass{position:absolute;top:60px;right:12px;z-index:1000;width:40px;height:40px;display:flex;align-items:center;justify-content:center;}
+  #compass-group{position:absolute;top:60px;right:12px;z-index:1000;display:flex;flex-direction:column;align-items:center;gap:8px;}
+  #compass{width:40px;height:40px;display:flex;align-items:center;justify-content:center;}
+  #reset-btn{width:38px;height:38px;background:rgba(20,20,20,0.9);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--danger);box-shadow:0 2px 8px rgba(0,0,0,0.4);}
+  #reset-btn:active{background:var(--surface2);transform:scale(0.92);}
+  #reset-btn svg{width:16px;height:16px;}
 
   /* BOTTOM NAV */
   .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-height);background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;z-index:100;padding-bottom:env(safe-area-inset-bottom);}
@@ -252,19 +254,23 @@
     <button id="snap-btn" onclick="snapToLocation()" title="Snap to my location">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 2"/></svg>
     </button>
-    <div id="compass">
-      <svg id="compass-svg" viewBox="0 0 40 40" width="40" height="40">
-        <circle cx="20" cy="20" r="19" fill="rgba(20,20,20,0.85)" stroke="#2a2a2a" stroke-width="1.5"/>
-        <text x="20" y="9" text-anchor="middle" fill="#888" font-size="7" font-family="DM Sans,sans-serif">N</text>
-        <text x="20" y="36" text-anchor="middle" fill="#555" font-size="6" font-family="DM Sans,sans-serif">S</text>
-        <text x="7" y="22" text-anchor="middle" fill="#555" font-size="6" font-family="DM Sans,sans-serif">W</text>
-        <text x="33" y="22" text-anchor="middle" fill="#555" font-size="6" font-family="DM Sans,sans-serif">E</text>
-        <polygon id="compass-needle-n" points="20,8 17,22 20,20 23,22" fill="#ff4a4a"/>
-        <polygon id="compass-needle-s" points="20,32 17,20 20,22 23,20" fill="#888"/>
-      </svg>
-      <div id="compass-unavail" style="display:none;font-size:9px;color:var(--text-dimmer);text-align:center;line-height:1.2;">no<br>compass</div>
+    <div id="compass-group">
+      <div id="compass">
+        <svg id="compass-svg" viewBox="0 0 40 40" width="40" height="40">
+          <circle cx="20" cy="20" r="19" fill="rgba(20,20,20,0.85)" stroke="#2a2a2a" stroke-width="1.5"/>
+          <text x="20" y="9" text-anchor="middle" fill="#888" font-size="7" font-family="DM Sans,sans-serif">N</text>
+          <text x="20" y="36" text-anchor="middle" fill="#555" font-size="6" font-family="DM Sans,sans-serif">S</text>
+          <text x="7" y="22" text-anchor="middle" fill="#555" font-size="6" font-family="DM Sans,sans-serif">W</text>
+          <text x="33" y="22" text-anchor="middle" fill="#555" font-size="6" font-family="DM Sans,sans-serif">E</text>
+          <polygon id="compass-needle-n" points="20,8 17,22 20,20 23,22" fill="#ff4a4a"/>
+          <polygon id="compass-needle-s" points="20,32 17,20 20,22 23,20" fill="#888"/>
+        </svg>
+        <div id="compass-unavail" style="display:none;font-size:9px;color:var(--text-dimmer);text-align:center;line-height:1.2;">no<br>compass</div>
+      </div>
+      <button id="reset-btn" onclick="resetTrack()" title="Reset path">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+      </button>
     </div>
-    <span id="reset-text" onclick="resetTrack()">reset path</span>
   </div>
 </div>
 
@@ -450,6 +456,17 @@ function dbAdd(s,d){return new Promise((r,j)=>{const q=db.transaction(s,'readwri
 function dbPut(s,d){return new Promise((r,j)=>{const q=db.transaction(s,'readwrite').objectStore(s).put(d);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);})}
 function dbDelete(s,k){return new Promise((r,j)=>{const q=db.transaction(s,'readwrite').objectStore(s).delete(k);q.onsuccess=()=>r();q.onerror=()=>j(q.error);})}
 
+// ── SYNC METADATA ──
+// These fields are no-ops locally but give every record a stable identity
+// for a future server sync / share feature without needing a DB migration.
+function syncMeta() {
+  return {
+    syncId: crypto.randomUUID(),   // stable UUID for server-side dedup
+    syncedAt: null,                // null = never synced; set to timestamp after upload
+    ownerId: null,                 // null = local-only; set to user ID after login
+  };
+}
+
 // ══════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════
@@ -597,7 +614,7 @@ async function confirmAlbum() {
     document.getElementById('album-detail-title').textContent=name;
     renderAlbums();
   } else {
-    await dbAdd('albums',{name,order,created:Date.now()});
+    await dbAdd('albums',{name,order,created:Date.now(),...syncMeta()});
     closeModal('modal-album');showToast('Album created');renderAlbums();
   }
 }
@@ -649,7 +666,7 @@ async function uploadPhotos() {
   document.getElementById('loading').classList.add('show');
   for (const file of pendingFiles) {
     const dataUrl=await fileToDataUrl(file);
-    await dbAdd('photos',{name:file.name,dataUrl,albumId:albumIdNum,albumName,date:Date.now()});
+    await dbAdd('photos',{name:file.name,dataUrl,albumId:albumIdNum,albumName,date:Date.now(),...syncMeta()});
   }
   document.getElementById('loading').classList.remove('show');
   showToast(`${pendingFiles.length} photo${pendingFiles.length>1?'s':''} saved`);
@@ -696,7 +713,7 @@ async function renderNotes() {
 }
 
 async function createNote() {
-  const id = await dbAdd('notes',{title:'',body:'',created:Date.now(),updated:Date.now()});
+  const id = await dbAdd('notes',{title:'',body:'',created:Date.now(),updated:Date.now(),...syncMeta()});
   openNote(id);
 }
 
