@@ -59,54 +59,21 @@
   .detail-title{font-size:20px;font-weight:600;flex:1;}
   .detail-count{font-size:13px;color:var(--text-dim);}
 
-  /* SCHEDULE */
-  .schedule-list{display:flex;flex-direction:column;gap:8px;padding:8px 16px 120px;}
-  /* collapsed row */
-  .hw-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color 0.2s;}
-  .hw-card.overdue{border-color:rgba(255,74,74,0.4);}
-  .hw-card.soon{border-color:rgba(255,170,74,0.4);}
-  .hw-collapsed{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;}
-  .hw-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--text-dimmer);}
-  .hw-dot.overdue{background:var(--danger);}
-  .hw-dot.soon{background:var(--warning);}
-  .hw-dot.ok{background:var(--green);}
-  .hw-collapsed-name{flex:1;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .hw-collapsed-time{font-size:11px;color:var(--text-dim);font-family:'DM Mono',monospace;flex-shrink:0;margin-right:4px;}
-  .hw-collapsed-actions{display:flex;gap:4px;flex-shrink:0;}
-  .hw-chevron{color:var(--text-dimmer);flex-shrink:0;transition:transform 0.2s;}
-  .hw-card.expanded .hw-chevron{transform:rotate(180deg);}
-  /* expanded details */
-  .hw-expanded{display:none;padding:0 14px 14px;border-top:1px solid var(--border);}
-  .hw-card.expanded .hw-expanded{display:block;}
-  .hw-detail-row{display:flex;align-items:flex-start;gap:12px;padding-top:12px;}
-  .hw-deadline-block{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:44px;background:var(--surface2);border-radius:8px;padding:6px 4px;flex-shrink:0;}
-  .hw-deadline-day{font-size:18px;font-weight:600;line-height:1;}
-  .hw-deadline-month{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
-  .hw-deadline-time{font-size:10px;color:var(--accent);margin-top:3px;font-family:'DM Mono',monospace;}
-  .hw-body{flex:1;min-width:0;}
-  .hw-name{font-size:15px;font-weight:600;}
-  .hw-desc{font-size:12px;color:var(--text-dim);margin-top:3px;line-height:1.4;}
-  .hw-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;margin-top:6px;display:inline-block;}
-  .hw-badge.overdue{background:rgba(255,74,74,0.15);color:var(--danger);}
-  .hw-badge.soon{background:rgba(255,170,74,0.15);color:var(--warning);}
-  .hw-badge.ok{background:rgba(74,255,138,0.12);color:var(--green);}
-  .hw-action-btn{background:none;border:none;color:var(--text-dimmer);cursor:pointer;padding:4px;border-radius:6px;transition:color 0.15s,background 0.15s;display:flex;align-items:center;justify-content:center;}
-  .hw-action-btn.delete:active{color:var(--danger);background:rgba(255,74,74,0.1);}
-  .hw-action-btn.settings:active{color:var(--accent);}
-  .hw-action-btn svg{width:16px;height:16px;}
-
-  /* NOTIF SETTINGS */
-  .notif-option{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;}
-  .notif-option:last-child{border-bottom:none;}
-  .notif-checkbox{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background 0.15s,border-color 0.15s;margin-top:1px;}
-  .notif-checkbox.checked{background:var(--accent);border-color:var(--accent);}
-  .notif-checkbox svg{width:12px;height:12px;color:#fff;}
-  .notif-option-text{flex:1;}
-  .notif-option-label{font-size:14px;font-weight:500;}
-  .notif-option-sub{font-size:12px;color:var(--text-dim);margin-top:2px;}
-  .custom-datetime-wrap{margin-top:10px;display:none;}
-  .custom-datetime-wrap.show{display:block;}
-  .notif-banner{margin:0 16px 10px;padding:10px 14px;background:rgba(74,158,255,0.08);border:1px solid rgba(74,158,255,0.2);border-radius:10px;font-size:12px;color:var(--text-dim);line-height:1.4;}
+  /* NOTES */
+  .notes-grid{display:flex;flex-direction:column;gap:10px;padding:8px 16px 120px;}
+  .note-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px 12px;cursor:pointer;position:relative;transition:border-color 0.15s,transform 0.1s;}
+  .note-card:active{transform:scale(0.98);}
+  .note-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .note-card-title{font-size:15px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .note-card-gear{background:none;border:none;color:var(--text-dimmer);cursor:pointer;padding:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:6px;transition:color 0.15s;}
+  .note-card-gear:active{color:var(--accent);}
+  .note-card-gear svg{width:16px;height:16px;}
+  .note-card-preview{font-size:12px;color:var(--text-dim);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:18px;}
+  .note-card-date{font-size:10px;color:var(--text-dimmer);margin-top:8px;}
+  .note-detail-topbar{display:flex;align-items:center;gap:12px;padding:16px 20px 12px;background:var(--bg);position:sticky;top:0;z-index:10;}
+  .note-detail-title{font-size:18px;font-weight:600;flex:1;background:none;border:none;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;min-width:0;}
+  .note-editor{flex:1;padding:0 20px 40px;font-size:15px;line-height:1.7;color:var(--text);background:transparent;border:none;outline:none;resize:none;font-family:'DM Sans',sans-serif;width:100%;-webkit-overflow-scrolling:touch;}
+  .note-editor::placeholder{color:var(--text-dimmer);}
 
   /* BACKTRACKER */
   #screen-backtracker{display:none;flex-direction:column;height:100vh;}
@@ -249,20 +216,30 @@
   </div>
 </div>
 
-<!-- SCHEDULE -->
-<div class="screen" id="screen-schedule">
+<!-- NOTES LIST -->
+<div class="screen" id="screen-notes">
   <div class="topbar">
-    <span class="topbar-title">Schedule</span>
+    <span class="topbar-title">Notes</span>
     <div class="topbar-actions">
-      <button class="icon-btn" onclick="openAddHomeworkModal()">
+      <button class="icon-btn" onclick="createNote()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
     </div>
   </div>
   <div class="scroll-area">
-    <div id="notif-banner-wrap"></div>
-    <div class="schedule-list" id="schedule-list"></div>
+    <div class="notes-grid" id="notes-grid"></div>
   </div>
+</div>
+
+<!-- NOTE DETAIL -->
+<div class="screen" id="screen-note-detail">
+  <div class="note-detail-topbar">
+    <button class="back-btn" onclick="saveAndBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <input class="note-detail-title" id="note-title-input" placeholder="Title" maxlength="80">
+  </div>
+  <textarea class="note-editor" id="note-body-input" placeholder="Start typing..."></textarea>
 </div>
 
 <!-- BACKTRACKER -->
@@ -299,9 +276,9 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
     <span class="nav-label">Pictures</span>
   </button>
-  <button class="nav-item" id="nav-schedule" onclick="showScreen('schedule')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    <span class="nav-label">Schedule</span>
+  <button class="nav-item" id="nav-notes" onclick="showScreen('notes')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <span class="nav-label">Notes</span>
   </button>
   <button class="nav-item" id="nav-backtracker" onclick="showScreen('backtracker')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
@@ -379,71 +356,42 @@
   </div>
 </div>
 
-<!-- Add Homework -->
-<div class="modal-overlay" id="modal-homework">
+<!-- Note Settings -->
+<div class="modal-overlay" id="modal-note-settings">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Add Homework</div>
-    <input class="modal-input" id="hw-name-input" placeholder="Homework name" maxlength="80">
-    <textarea class="modal-input" id="hw-desc-input" placeholder="Description (optional)" maxlength="300"></textarea>
-    <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">Deadline</div>
-    <input class="modal-input" id="hw-datetime-input" type="datetime-local">
+    <div class="modal-title">Note</div>
+    <div id="note-settings-name" style="font-size:13px;color:var(--text-dim);margin-bottom:16px;margin-top:-12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn-secondary" onclick="renameNoteFromSettings()" style="text-align:left;padding:14px 16px;">✏️ &nbsp; Rename</button>
+      <button class="btn-secondary" onclick="deleteNoteFromSettings()" style="text-align:left;padding:14px 16px;color:var(--danger);border-color:rgba(255,74,74,0.3);">🗑️ &nbsp; Delete note</button>
+    </div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal('modal-note-settings')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- Rename Note -->
+<div class="modal-overlay" id="modal-note-rename">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Rename Note</div>
+    <input class="modal-input" id="note-rename-input" placeholder="Note title" maxlength="80">
     <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('modal-homework')">Cancel</button>
-      <button class="btn-primary" onclick="confirmHomework()">Add</button>
+      <button class="btn-secondary" onclick="closeModal('modal-note-rename')">Cancel</button>
+      <button class="btn-primary" onclick="confirmRenameNote()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- Delete Homework -->
-<div class="modal-overlay" id="modal-hw-delete">
+<!-- Confirm Delete Note -->
+<div class="modal-overlay" id="modal-note-delete">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">Delete this homework?</div>
-    <div id="hw-delete-name" style="font-size:14px;color:var(--text-dim);margin-bottom:4px;"></div>
+    <div class="modal-title">Delete this note?</div>
+    <div id="note-delete-name" style="font-size:14px;color:var(--text-dim);margin-bottom:4px;"></div>
     <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('modal-hw-delete')">Cancel</button>
-      <button class="btn-primary" style="background:var(--danger);" onclick="confirmDeleteHomework()">Delete</button>
-    </div>
-  </div>
-</div>
-
-<!-- Notification Settings -->
-<div class="modal-overlay" id="modal-hw-settings">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Reminder Settings</div>
-    <div id="settings-hw-name" style="font-size:13px;color:var(--text-dim);margin-bottom:16px;margin-top:-12px;"></div>
-    <div class="notif-option" onclick="toggleNotifOption('day')">
-      <div class="notif-checkbox" id="chk-day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="notif-option-text">
-        <div class="notif-option-label">Remind me 1 day before</div>
-        <div class="notif-option-sub">Fires at the same time, one day earlier</div>
-      </div>
-    </div>
-    <div class="notif-option" onclick="toggleNotifOption('deadline')">
-      <div class="notif-checkbox" id="chk-deadline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="notif-option-text">
-        <div class="notif-option-label">Remind me at deadline</div>
-        <div class="notif-option-sub">Fires exactly at the deadline time</div>
-      </div>
-    </div>
-    <div class="notif-option" onclick="toggleNotifOption('custom')">
-      <div class="notif-checkbox" id="chk-custom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="notif-option-text">
-        <div class="notif-option-label">Custom reminder</div>
-        <div class="notif-option-sub">Pick a specific date & time</div>
-      </div>
-    </div>
-    <div class="custom-datetime-wrap" id="custom-datetime-wrap">
-      <input class="modal-input" id="custom-notif-datetime" type="datetime-local" style="margin-bottom:0;">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal('modal-hw-settings')">Cancel</button>
-      <button class="btn-primary" onclick="saveNotifSettings()">Save</button>
-    </div>
-    <div style="margin-top:12px;">
-      <button class="btn-secondary" onclick="deleteFromSettings()" style="width:100%;color:var(--danger);border-color:rgba(255,74,74,0.3);text-align:center;">🗑️ &nbsp; Delete this assignment</button>
+      <button class="btn-secondary" onclick="closeModal('modal-note-delete')">Cancel</button>
+      <button class="btn-primary" style="background:var(--danger);" onclick="confirmDeleteNote()">Delete</button>
     </div>
   </div>
 </div>
@@ -490,6 +438,8 @@ function initDB() {
         d.createObjectStore('albums',{keyPath:'id',autoIncrement:true});
       if (!d.objectStoreNames.contains('homework'))
         d.createObjectStore('homework',{keyPath:'id',autoIncrement:true});
+      if (!d.objectStoreNames.contains('notes'))
+        d.createObjectStore('notes',{keyPath:'id',autoIncrement:true});
     };
     req.onsuccess = e => { db = e.target.result; resolve(); };
     req.onerror = () => reject(req.error);
@@ -523,12 +473,12 @@ function showScreen(name, albumId=null) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(`screen-${name}`).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const navMap={pictures:'nav-pictures',schedule:'nav-schedule',backtracker:'nav-backtracker'};
+  const navMap={pictures:'nav-pictures',notes:'nav-notes',backtracker:'nav-backtracker'};
   if (navMap[name]) document.getElementById(navMap[name]).classList.add('active');
   const hideNav=['album-detail','upload'];
   document.querySelector('.bottom-nav').style.display=hideNav.includes(name)?'none':'';
   if (name==='pictures') renderAlbums();
-  if (name==='schedule') renderSchedule();
+  if (name==='notes') renderNotes();
   if (name==='backtracker') initMap();
   if (name==='album-detail' && albumId!==null) openAlbum(albumId);
 }
@@ -716,6 +666,173 @@ uploadBox.addEventListener('dragleave',()=>uploadBox.classList.remove('drag-over
 uploadBox.addEventListener('drop',e=>{e.preventDefault();uploadBox.classList.remove('drag-over');const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));pendingFiles.push(...files);renderUploadPreviews();});
 
 // ══════════════════════════════════════
+//  NOTES
+// ══════════════════════════════════════
+let currentNoteId = null;
+let activeSettingsNoteId = null;
+let noteAutoSaveTimer = null;
+
+async function renderNotes() {
+  const notes = await dbGetAll('notes');
+  notes.sort((a,b)=>b.updated-a.updated);
+  const grid = document.getElementById('notes-grid');
+  if (!notes.length) {
+    grid.innerHTML=`<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <h3>No notes yet</h3><p>Tap + to create your first note.</p>
+    </div>`; return;
+  }
+  grid.innerHTML = notes.map(n=>{
+    const preview = (n.body||'').trim().split('
+').slice(0,2).join(' ').slice(0,120);
+    const date = new Date(n.updated).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    return `<div class="note-card" onclick="openNote(${n.id})">
+      <div class="note-card-header">
+        <div class="note-card-title">${n.title||'Untitled'}</div>
+        <button class="note-card-gear" onclick="event.stopPropagation();openNoteSettings(${n.id})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+      <div class="note-card-preview">${preview||'<span style="color:var(--text-dimmer)">Empty note</span>'}</div>
+      <div class="note-card-date">${date}</div>
+    </div>`;
+  }).join('');
+}
+
+async function createNote() {
+  const id = await dbAdd('notes',{title:'',body:'',created:Date.now(),updated:Date.now()});
+  openNote(id);
+}
+
+async function openNote(id) {
+  currentNoteId = id;
+  const note = await dbGet('notes', id);
+  document.getElementById('note-title-input').value = note.title||'';
+  document.getElementById('note-body-input').value = note.body||'';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-note-detail').classList.add('active');
+  document.querySelector('.bottom-nav').style.display='none';
+  setTimeout(()=>document.getElementById('note-body-input').focus(),100);
+}
+
+async function saveCurrentNote() {
+  if (!currentNoteId) return;
+  const note = await dbGet('notes', currentNoteId);
+  if (!note) return;
+  note.title = document.getElementById('note-title-input').value.trim();
+  note.body  = document.getElementById('note-body-input').value;
+  note.updated = Date.now();
+  await dbPut('notes', note);
+}
+
+async function saveAndBack() {
+  await saveCurrentNote();
+  currentNoteId = null;
+  showScreen('notes');
+}
+
+// autosave while typing
+document.getElementById('note-title-input').addEventListener('input', ()=>{
+  clearTimeout(noteAutoSaveTimer);
+  noteAutoSaveTimer = setTimeout(saveCurrentNote, 800);
+});
+document.getElementById('note-body-input').addEventListener('input', ()=>{
+  clearTimeout(noteAutoSaveTimer);
+  noteAutoSaveTimer = setTimeout(saveCurrentNote, 800);
+});
+
+async function openNoteSettings(id) {
+  activeSettingsNoteId = id;
+  const note = await dbGet('notes', id);
+  document.getElementById('note-settings-name').textContent = note.title||'Untitled';
+  openModal('modal-note-settings');
+}
+
+function renameNoteFromSettings() {
+  closeModal('modal-note-settings');
+  const current = document.getElementById('note-settings-name').textContent;
+  document.getElementById('note-rename-input').value = current === 'Untitled' ? '' : current;
+  openModal('modal-note-rename');
+  setTimeout(()=>document.getElementById('note-rename-input').focus(),200);
+}
+
+async function confirmRenameNote() {
+  const name = document.getElementById('note-rename-input').value.trim();
+  if (!name) { showToast('Enter a title'); return; }
+  const note = await dbGet('notes', activeSettingsNoteId);
+  note.title = name; note.updated = Date.now();
+  await dbPut('notes', note);
+  closeModal('modal-note-rename');
+  showToast('Renamed'); renderNotes();
+}
+
+function deleteNoteFromSettings() {
+  closeModal('modal-note-settings');
+  const name = document.getElementById('note-settings-name').textContent;
+  document.getElementById('note-delete-name').textContent = name;
+  openModal('modal-note-delete');
+}
+
+async function confirmDeleteNote() {
+  await dbDelete('notes', activeSettingsNoteId);
+  closeModal('modal-note-delete');
+  showToast('Note deleted'); renderNotes();
+}
+
+// ══════════════════════════════════════
+//  UPLOAD// ══════════════════════════════════════
+//  UPLOAD
+// ══════════════════════════════════════
+async function initUploadScreen() {
+  const albums=await dbGetAll('albums');
+  const sel=document.getElementById('upload-album-select');
+  sel.innerHTML='<option value="">Uncategorized</option>'+albums.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  pendingFiles=[];
+  document.getElementById('upload-preview').style.display='none';
+  document.getElementById('upload-preview').innerHTML='';
+  document.getElementById('upload-btn').disabled=true;
+}
+
+function handleFileSelect(e) {
+  const files=Array.from(e.target.files);
+  if (!files.length) return;
+  pendingFiles.push(...files);renderUploadPreviews();e.target.value='';
+}
+function renderUploadPreviews() {
+  const preview=document.getElementById('upload-preview');
+  if (!pendingFiles.length){preview.style.display='none';preview.innerHTML='';document.getElementById('upload-btn').disabled=true;return;}
+  preview.style.display='grid';
+  preview.innerHTML=pendingFiles.map((f,i)=>{
+    const url=URL.createObjectURL(f);
+    return `<div class="upload-preview-item"><img src="${url}" alt=""><button class="remove-preview" onclick="removePendingFile(${i})">×</button></div>`;
+  }).join('');
+  document.getElementById('upload-btn').disabled=false;
+}
+function removePendingFile(i){pendingFiles.splice(i,1);renderUploadPreviews();}
+
+async function uploadPhotos() {
+  if (!pendingFiles.length) return;
+  const albumId=document.getElementById('upload-album-select').value;
+  const albumIdNum=albumId?parseInt(albumId):null;
+  let albumName=null;
+  if (albumIdNum){const a=await dbGet('albums',albumIdNum);albumName=a?a.name:null;}
+  document.getElementById('loading').classList.add('show');
+  for (const file of pendingFiles) {
+    const dataUrl=await fileToDataUrl(file);
+    await dbAdd('photos',{name:file.name,dataUrl,albumId:albumIdNum,albumName,date:Date.now()});
+  }
+  document.getElementById('loading').classList.remove('show');
+  showToast(`${pendingFiles.length} photo${pendingFiles.length>1?'s':''} saved`);
+  pendingFiles=[];showScreen('pictures');
+}
+function fileToDataUrl(f){return new Promise(r=>{const rd=new FileReader();rd.onload=e=>r(e.target.result);rd.readAsDataURL(f);});}
+
+const uploadBox=document.getElementById('upload-box');
+uploadBox.addEventListener('dragover',e=>{e.preventDefault();uploadBox.classList.add('drag-over');});
+uploadBox.addEventListener('dragleave',()=>uploadBox.classList.remove('drag-over'));
+uploadBox.addEventListener('drop',e=>{e.preventDefault();uploadBox.classList.remove('drag-over');const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));pendingFiles.push(...files);renderUploadPreviews();});
+
+// ══════════════════════════════════════
 //  SCHEDULE
 // ══════════════════════════════════════
 async function renderSchedule() {
@@ -846,7 +963,7 @@ async function checkNotifications() {
     if(changed)await dbPut('homework',hw);
   }
 }
-setInterval(checkNotifications,60000);
+
 
 // ══════════════════════════════════════
 //  BACKTRACKER
