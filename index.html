@@ -72,8 +72,21 @@
   .note-card-date{font-size:10px;color:var(--text-dimmer);margin-top:8px;}
   .note-detail-topbar{display:flex;align-items:center;gap:12px;padding:16px 20px 12px;background:var(--bg);position:sticky;top:0;z-index:10;}
   .note-detail-title{font-size:18px;font-weight:600;flex:1;background:none;border:none;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;min-width:0;}
-  .note-editor{flex:1;padding:0 20px 40px;font-size:15px;line-height:1.7;color:var(--text);background:transparent;border:none;outline:none;resize:none;font-family:'DM Sans',sans-serif;width:100%;-webkit-overflow-scrolling:touch;}
-  .note-editor::placeholder{color:var(--text-dimmer);}
+  .note-editor{flex:1;padding:0 20px 40px;font-size:15px;line-height:1.7;color:var(--text);background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;width:100%;-webkit-overflow-scrolling:touch;overflow-y:auto;word-break:break-word;}
+  .note-editor:empty::before{content:attr(data-placeholder);color:var(--text-dimmer);pointer-events:none;}
+  .note-editor:focus{outline:none;}
+  /* FORMAT TOOLBAR */
+  .fmt-toolbar{display:flex;align-items:center;gap:4px;padding:6px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;}
+  .fmt-toolbar::-webkit-scrollbar{display:none;}
+  .fmt-toolbar-divider{width:1px;height:20px;background:var(--border);flex-shrink:0;margin:0 2px;}
+  .fmt-btn{min-width:32px;height:32px;padding:0 6px;border-radius:7px;border:none;background:none;color:var(--text-dim);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.1s,color 0.1s;}
+  .fmt-btn:active,.fmt-btn.active{background:var(--surface2);color:var(--accent);}
+  .fmt-btn svg{width:15px;height:15px;}
+  .fmt-btn.bold-btn{font-weight:700;font-family:'DM Sans',sans-serif;}
+  .fmt-btn.italic-btn{font-style:italic;font-family:'DM Sans',sans-serif;}
+  .fmt-swatch{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;flex-shrink:0;transition:transform 0.1s,border-color 0.1s;}
+  .fmt-swatch:active,.fmt-swatch.active{transform:scale(1.2);border-color:var(--text);}
+  .fmt-size-btn{font-family:'DM Sans',sans-serif;font-weight:500;min-width:36px;}
 
   /* BACKTRACKER */
   .tracker-controls{padding:16px 20px 12px;background:var(--bg);display:flex;flex-direction:column;gap:10px;z-index:10;}
@@ -239,7 +252,39 @@
     </button>
     <input class="note-detail-title" id="note-title-input" placeholder="Title" maxlength="80">
   </div>
-  <textarea class="note-editor" id="note-body-input" placeholder="Start typing..."></textarea>
+  <!-- FORMAT TOOLBAR -->
+  <div class="fmt-toolbar" id="fmt-toolbar">
+    <!-- Text style -->
+    <button class="fmt-btn bold-btn" id="fmt-bold" onclick="fmtExec('bold')" title="Bold">B</button>
+    <button class="fmt-btn italic-btn" id="fmt-italic" onclick="fmtExec('italic')" title="Italic">I</button>
+    <button class="fmt-btn" id="fmt-underline" onclick="fmtExec('underline')" title="Underline" style="text-decoration:underline;">U</button>
+    <button class="fmt-btn" id="fmt-strike" onclick="fmtExec('strikeThrough')" title="Strikethrough" style="text-decoration:line-through;">S</button>
+    <div class="fmt-toolbar-divider"></div>
+    <!-- Font size -->
+    <button class="fmt-btn fmt-size-btn" onclick="fmtSize('small')" title="Small">S</button>
+    <button class="fmt-btn fmt-size-btn" onclick="fmtSize('normal')" title="Normal">M</button>
+    <button class="fmt-btn fmt-size-btn" onclick="fmtSize('large')" title="Large">L</button>
+    <button class="fmt-btn fmt-size-btn" onclick="fmtSize('heading')" title="Heading" style="font-size:16px;font-weight:700;">H</button>
+    <div class="fmt-toolbar-divider"></div>
+    <!-- Text color swatches -->
+    <div class="fmt-swatch" style="background:#ffffff;" onclick="fmtColor('#ffffff')" title="White"></div>
+    <div class="fmt-swatch" style="background:#a0c4ff;" onclick="fmtColor('#a0c4ff')" title="Blue"></div>
+    <div class="fmt-swatch" style="background:#caffbf;" onclick="fmtColor('#caffbf')" title="Green"></div>
+    <div class="fmt-swatch" style="background:#ffd6a5;" onclick="fmtColor('#ffd6a5')" title="Orange"></div>
+    <div class="fmt-swatch" style="background:#ffadad;" onclick="fmtColor('#ffadad')" title="Red"></div>
+    <div class="fmt-swatch" style="background:#fdffb6;" onclick="fmtColor('#fdffb6')" title="Yellow"></div>
+    <div class="fmt-swatch" style="background:#bdb2ff;" onclick="fmtColor('#bdb2ff')" title="Purple"></div>
+    <div class="fmt-toolbar-divider"></div>
+    <!-- Highlight -->
+    <button class="fmt-btn" onclick="fmtHighlight()" title="Highlight">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    </button>
+    <!-- Clear formatting -->
+    <button class="fmt-btn" onclick="fmtClear()" title="Clear formatting">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+    </button>
+  </div>
+  <div class="note-editor" id="note-body-input" contenteditable="true" data-placeholder="Start typing..."></div>
 </div>
 
 <!-- BACKTRACKER -->
@@ -697,7 +742,7 @@ async function renderNotes() {
     </div>`; return;
   }
   grid.innerHTML = notes.map(n=>{
-    const preview = (n.body||'').trim().split('\n').slice(0,2).join(' ').slice(0,120);
+    const preview = (n.body||'').replace(/<[^>]*>/g,'').trim().split('\n').slice(0,2).join(' ').slice(0,120);
     const date = new Date(n.updated).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     return `<div class="note-card" onclick="openNote(${n.id})">
       <div class="note-card-header">
@@ -721,19 +766,21 @@ async function openNote(id) {
   currentNoteId = id;
   const note = await dbGet('notes', id);
   document.getElementById('note-title-input').value = note.title||'';
-  document.getElementById('note-body-input').value = note.body||'';
+  // body is now HTML (rich text); old plain-text notes load fine as-is
+  const editor = document.getElementById('note-body-input');
+  editor.innerHTML = note.body||'';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-note-detail').classList.add('active');
   document.querySelector('.bottom-nav').style.display='none';
-  setTimeout(()=>document.getElementById('note-body-input').focus(),100);
+  setTimeout(()=>{ editor.focus(); updateFmtState(); },100);
 }
 
 async function saveCurrentNote() {
   if (!currentNoteId) return;
   const note = await dbGet('notes', currentNoteId);
   if (!note) return;
-  note.title = document.getElementById('note-title-input').value.trim();
-  note.body  = document.getElementById('note-body-input').value;
+  note.title   = document.getElementById('note-title-input').value.trim();
+  note.body    = document.getElementById('note-body-input').innerHTML;
   note.updated = Date.now();
   await dbPut('notes', note);
 }
@@ -753,6 +800,60 @@ document.getElementById('note-body-input').addEventListener('input', ()=>{
   clearTimeout(noteAutoSaveTimer);
   noteAutoSaveTimer = setTimeout(saveCurrentNote, 800);
 });
+document.getElementById('note-body-input').addEventListener('keyup', updateFmtState);
+document.getElementById('note-body-input').addEventListener('mouseup', updateFmtState);
+document.getElementById('note-body-input').addEventListener('selectionchange', updateFmtState);
+
+// ── FORMAT FUNCTIONS ──
+function fmtExec(cmd) {
+  document.getElementById('note-body-input').focus();
+  document.execCommand(cmd, false, null);
+  updateFmtState();
+}
+
+const SIZE_MAP = { small:'12px', normal:'15px', large:'20px', heading:'26px' };
+function fmtSize(key) {
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  if (range.collapsed) return;
+  const span = document.createElement('span');
+  span.style.fontSize = SIZE_MAP[key];
+  if (key === 'heading') span.style.fontWeight = '700';
+  range.surroundContents(span);
+  updateFmtState();
+}
+
+function fmtColor(hex) {
+  document.getElementById('note-body-input').focus();
+  document.execCommand('foreColor', false, hex);
+  // mark active swatch
+  document.querySelectorAll('.fmt-swatch').forEach(s=>{
+    s.classList.toggle('active', s.style.background === hex || s.getAttribute('onclick')===`fmtColor('${hex}')`);
+  });
+}
+
+let _highlightOn = false;
+function fmtHighlight() {
+  document.getElementById('note-body-input').focus();
+  _highlightOn = !_highlightOn;
+  document.execCommand('hiliteColor', false, _highlightOn ? '#fdffb6' : 'transparent');
+  document.getElementById('fmt-toolbar').querySelector('[title="Highlight"]').classList.toggle('active', _highlightOn);
+}
+
+function fmtClear() {
+  document.getElementById('note-body-input').focus();
+  document.execCommand('removeFormat', false, null);
+  updateFmtState();
+}
+
+function updateFmtState() {
+  const states = { bold:'fmt-bold', italic:'fmt-italic', underline:'fmt-underline', strikeThrough:'fmt-strike' };
+  for (const [cmd, id] of Object.entries(states)) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', document.queryCommandState(cmd));
+  }
+}
 
 async function openNoteSettings(id) {
   activeSettingsNoteId = id;
