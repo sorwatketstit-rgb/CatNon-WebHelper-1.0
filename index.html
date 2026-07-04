@@ -174,6 +174,41 @@
   /* leaflet dark tweak */
   .leaflet-container{background:#1a1a1a;}
   .leaflet-tile{filter:brightness(0.85) saturate(0.9);}
+
+  /* MORE SCREEN */
+  .more-list{display:flex;flex-direction:column;padding:8px 0;}
+  .more-list-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left;transition:background 0.1s;}
+  .more-list-item:first-child{border-top:1px solid var(--border);}
+  .more-list-item:active{background:var(--surface);}
+  .more-list-item-name{font-size:15px;color:var(--text);font-weight:500;}
+  .more-list-item-chevron{color:var(--text-dimmer);}
+  .more-list-item-chevron svg{width:16px;height:16px;}
+
+  /* FILEDROP */
+  .filedrop-body{display:flex;flex-direction:column;gap:16px;padding:16px 16px 40px;overflow-y:auto;flex:1;}
+  .fd-mode-row{display:flex;gap:8px;}
+  .fd-mode-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text-dim);font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s;}
+  .fd-mode-btn svg{width:16px;height:16px;}
+  .fd-mode-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(74,158,255,0.08);}
+  .fd-panel{display:flex;flex-direction:column;gap:12px;}
+  .fd-instruction{font-size:13px;color:var(--text-dim);line-height:1.6;text-align:center;}
+  .fd-code-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .fd-code{font-size:38px;font-weight:700;letter-spacing:10px;color:var(--accent);font-family:'DM Mono',monospace;}
+  .fd-code-label{font-size:11px;color:var(--text-dimmer);}
+  .fd-status{font-size:13px;color:var(--text-dim);text-align:center;min-height:20px;}
+  .fd-file-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:var(--radius);border:1px dashed var(--border);background:var(--surface);color:var(--text-dim);font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s;width:100%;}
+  .fd-file-btn:not([disabled]):active{border-color:var(--accent);color:var(--accent);}
+  .fd-file-btn[disabled]{opacity:0.4;cursor:not-allowed;}
+  .fd-file-btn svg{width:18px;height:18px;}
+  .fd-code-input{width:100%;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:22px;font-weight:700;letter-spacing:6px;text-align:center;font-family:'DM Mono',monospace;outline:none;box-sizing:border-box;}
+  .fd-code-input:focus{border-color:var(--accent);}
+  .fd-progress-wrap{display:flex;flex-direction:column;gap:6px;}
+  .fd-progress-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+  .fd-progress-fill{height:100%;background:var(--accent);border-radius:3px;width:0%;transition:width 0.2s;}
+  .fd-progress-label{font-size:12px;color:var(--text-dim);text-align:right;}
+  .fd-recv-file{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-top:4px;}
+  .fd-recv-file-name{flex:1;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fd-recv-file-dl{font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -319,19 +354,91 @@
   </div>
 </div>
 
+<!-- MORE SCREEN -->
+<div class="screen" id="screen-more">
+  <div class="topbar">
+    <span class="topbar-title">More</span>
+  </div>
+  <div class="more-list">
+    <button class="more-list-item" onclick="showScreen('backtracker')">
+      <span class="more-list-item-name">Backtracker</span>
+      <span class="more-list-item-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </button>
+    <button class="more-list-item" onclick="showScreen('filedrop')">
+      <span class="more-list-item-name">FileDrop</span>
+      <span class="more-list-item-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </button>
+  </div>
+</div>
+
+<!-- FILEDROP SCREEN -->
+<div class="screen" id="screen-filedrop">
+  <div class="topbar">
+    <button class="back-btn" onclick="leaveFileDrop()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span class="topbar-title">FileDrop</span>
+  </div>
+  <div class="filedrop-body">
+    <div class="fd-mode-row" id="fd-mode-row">
+      <button class="fd-mode-btn active" id="fd-btn-send" onclick="fdSetMode('send')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send
+      </button>
+      <button class="fd-mode-btn" id="fd-btn-receive" onclick="fdSetMode('receive')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+        Receive
+      </button>
+    </div>
+
+    <!-- SEND panel -->
+    <div id="fd-panel-send" class="fd-panel">
+      <div class="fd-instruction">Share the code with the other device, then pick a file.</div>
+      <div class="fd-code-box">
+        <div class="fd-code" id="fd-my-code">—</div>
+        <div class="fd-code-label">Your code</div>
+      </div>
+      <div class="fd-status" id="fd-send-status">Starting…</div>
+      <button class="fd-file-btn" id="fd-pick-file" onclick="fdPickFile()" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Choose file
+      </button>
+      <input type="file" id="fd-file-input" style="display:none" onchange="fdSendFile(this.files[0])">
+      <div class="fd-progress-wrap" id="fd-send-progress-wrap" style="display:none">
+        <div class="fd-progress-bar"><div class="fd-progress-fill" id="fd-send-fill"></div></div>
+        <div class="fd-progress-label" id="fd-send-pct">0%</div>
+      </div>
+    </div>
+
+    <!-- RECEIVE panel -->
+    <div id="fd-panel-receive" class="fd-panel" style="display:none">
+      <div class="fd-instruction">Enter the code shown on the sender's device.</div>
+      <input class="fd-code-input" id="fd-peer-code" placeholder="XXXX" maxlength="8"
+             autocomplete="off" autocapitalize="characters" style="text-transform:uppercase;">
+      <button class="btn-primary" style="width:100%;margin-top:4px;" onclick="fdConnect()">Connect</button>
+      <div class="fd-status" id="fd-recv-status"></div>
+      <div class="fd-progress-wrap" id="fd-recv-progress-wrap" style="display:none">
+        <div class="fd-progress-bar"><div class="fd-progress-fill" id="fd-recv-fill"></div></div>
+        <div class="fd-progress-label" id="fd-recv-pct">0%</div>
+      </div>
+      <div id="fd-recv-files"></div>
+    </div>
+  </div>
+</div>
+
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="nav-item active" id="nav-pictures" onclick="showScreen('pictures')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-    <span class="nav-label">Pictures</span>
+    <span class="nav-label">Gallery</span>
   </button>
   <button class="nav-item" id="nav-notes" onclick="showScreen('notes')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
     <span class="nav-label">Notes</span>
   </button>
-  <button class="nav-item" id="nav-backtracker" onclick="showScreen('backtracker')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-    <span class="nav-label">Backtracker</span>
+  <button class="nav-item" id="nav-more" onclick="showScreen('more')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+    <span class="nav-label">More</span>
   </button>
 </nav>
 
@@ -466,6 +573,7 @@
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script>
 // ══════════════════════════════════════
 //  DATABASE
@@ -531,14 +639,17 @@ function showScreen(name, albumId=null) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(`screen-${name}`).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const navMap={pictures:'nav-pictures',notes:'nav-notes',backtracker:'nav-backtracker'};
+  // backtracker and filedrop are children of More — keep More tab highlighted
+  const navMap={pictures:'nav-pictures',notes:'nav-notes',more:'nav-more',backtracker:'nav-more',filedrop:'nav-more'};
   if (navMap[name]) document.getElementById(navMap[name]).classList.add('active');
-  const hideNav=['album-detail','upload'];
+  // hide nav for full-screen sub-screens
+  const hideNav=['album-detail','upload','backtracker','filedrop'];
   document.querySelector('.bottom-nav').style.display=hideNav.includes(name)?'none':'';
   if (name==='pictures') renderAlbums();
   if (name==='notes') renderNotes();
   if (name==='upload') initUploadScreen();
   if (name==='backtracker') initMap();
+  if (name==='filedrop') initFileDrop();
   if (name==='album-detail' && albumId!==null) openAlbum(albumId);
 }
 
@@ -1062,6 +1173,194 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 // upload init handled in showScreen directly
 
 // SW
+
+// ══════════════════════════════════════
+//  FILEDROP  (WebRTC P2P via PeerJS)
+// ══════════════════════════════════════
+let fdPeer = null;
+let fdConn = null;
+let fdMode = 'send';
+let fdChunks = [];
+let fdMeta = null;
+let fdInited = false;
+const FD_CHUNK = 64 * 1024; // 64 KB
+
+function fdSetMode(mode) {
+  fdMode = mode;
+  document.getElementById('fd-btn-send').classList.toggle('active', mode==='send');
+  document.getElementById('fd-btn-receive').classList.toggle('active', mode==='receive');
+  document.getElementById('fd-panel-send').style.display  = mode==='send'    ? '' : 'none';
+  document.getElementById('fd-panel-receive').style.display = mode==='receive' ? '' : 'none';
+}
+
+function fdGenCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({length:4}, ()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+
+function initFileDrop() {
+  // Only init once per session — keeps the same code stable while navigating away and back
+  if (fdInited && fdPeer && !fdPeer.destroyed) return;
+  fdInited = false;
+  fdDestroyPeer();
+  fdSetMode('send');
+  document.getElementById('fd-send-progress-wrap').style.display = 'none';
+  document.getElementById('fd-my-code').textContent = '…';
+  document.getElementById('fd-send-status').textContent = 'Starting…';
+  document.getElementById('fd-pick-file').disabled = true;
+
+  if (typeof Peer === 'undefined') {
+    document.getElementById('fd-send-status').textContent = 'PeerJS not loaded — check your connection.';
+    return;
+  }
+
+  const code = fdGenCode();
+  fdPeer = new Peer('catnon-' + code, { debug: 0 });
+
+  fdPeer.on('open', () => {
+    fdInited = true;
+    document.getElementById('fd-my-code').textContent = code;
+    document.getElementById('fd-send-status').textContent = 'Ready — share the code above';
+  });
+
+  fdPeer.on('connection', conn => {
+    fdConn = conn;
+    document.getElementById('fd-send-status').textContent = '✓ Receiver connected! Choose a file.';
+    document.getElementById('fd-pick-file').disabled = false;
+    conn.on('data', d => { if (d && d.type === 'ack') showToast('✓ File received by other device!'); });
+    conn.on('close', () => {
+      document.getElementById('fd-send-status').textContent = 'Disconnected.';
+      document.getElementById('fd-pick-file').disabled = true;
+    });
+  });
+
+  fdPeer.on('error', err => {
+    if (err.type === 'unavailable-id') {
+      // Collision — retry silently
+      fdPeer.destroy();
+      fdInited = false;
+      initFileDrop();
+    } else {
+      document.getElementById('fd-send-status').textContent = 'Error: ' + err.message;
+    }
+  });
+}
+
+function fdPickFile() {
+  document.getElementById('fd-file-input').click();
+}
+
+async function fdSendFile(file) {
+  if (!file) return;
+  if (!fdConn || !fdConn.open) { showToast('Not connected yet'); return; }
+
+  const wrap = document.getElementById('fd-send-progress-wrap');
+  const fill = document.getElementById('fd-send-fill');
+  const pct  = document.getElementById('fd-send-pct');
+  wrap.style.display = '';
+  fill.style.width = '0%';
+  pct.textContent = '0%';
+  document.getElementById('fd-send-status').textContent = 'Sending ' + file.name + '…';
+
+  fdConn.send({ type:'meta', name:file.name, size:file.size, mime:file.type });
+
+  const buf = await file.arrayBuffer();
+  const total = buf.byteLength;
+  let offset = 0;
+  while (offset < total) {
+    const chunk = buf.slice(offset, Math.min(offset + FD_CHUNK, total));
+    fdConn.send({ type:'chunk', data:chunk });
+    offset += chunk.byteLength;
+    const p = Math.round(offset / total * 100);
+    fill.style.width = p + '%';
+    pct.textContent = p + '%';
+    await new Promise(r => setTimeout(r, 0)); // yield to UI
+  }
+  fdConn.send({ type:'done' });
+  document.getElementById('fd-send-status').textContent = '✓ Sent!';
+}
+
+function fdConnect() {
+  const raw  = document.getElementById('fd-peer-code').value.trim().toUpperCase();
+  const code = raw.replace(/[^A-Z0-9]/g,'');
+  if (code.length < 4) { showToast('Enter the 4-character code'); return; }
+  if (typeof Peer === 'undefined') { showToast('PeerJS not loaded'); return; }
+
+  document.getElementById('fd-recv-status').textContent = 'Connecting…';
+  document.getElementById('fd-recv-progress-wrap').style.display = 'none';
+  fdChunks = [];
+  fdMeta   = null;
+
+  if (fdPeer && !fdPeer.destroyed) fdPeer.destroy();
+  fdPeer = new Peer({ debug:0 });
+
+  fdPeer.on('open', () => {
+    fdConn = fdPeer.connect('catnon-' + code, { reliable:true });
+
+    fdConn.on('open', () => {
+      document.getElementById('fd-recv-status').textContent = '✓ Connected! Waiting for file…';
+    });
+
+    fdConn.on('data', msg => {
+      if (!msg) return;
+      if (msg.type === 'meta') {
+        fdMeta   = msg;
+        fdChunks = [];
+        document.getElementById('fd-recv-progress-wrap').style.display = '';
+        document.getElementById('fd-recv-fill').style.width = '0%';
+        document.getElementById('fd-recv-pct').textContent = '0%';
+        document.getElementById('fd-recv-status').textContent = 'Receiving ' + msg.name + '…';
+      } else if (msg.type === 'chunk') {
+        fdChunks.push(msg.data);
+        if (fdMeta) {
+          const received = fdChunks.reduce((a,c) => a + (c.byteLength||0), 0);
+          const p = Math.min(100, Math.round(received / fdMeta.size * 100));
+          document.getElementById('fd-recv-fill').style.width = p + '%';
+          document.getElementById('fd-recv-pct').textContent = p + '%';
+        }
+      } else if (msg.type === 'done') {
+        const blob = new Blob(fdChunks, { type: fdMeta?.mime || 'application/octet-stream' });
+        const url  = URL.createObjectURL(blob);
+        const name = fdMeta?.name || 'received-file';
+        const el   = document.createElement('div');
+        el.className = 'fd-recv-file';
+        el.innerHTML = `<span class="fd-recv-file-name">${name}</span><a class="fd-recv-file-dl" href="${url}" download="${name}">Save ↓</a>`;
+        document.getElementById('fd-recv-files').prepend(el);
+        document.getElementById('fd-recv-fill').style.width = '100%';
+        document.getElementById('fd-recv-pct').textContent = '100%';
+        document.getElementById('fd-recv-status').textContent = '✓ File ready — tap Save ↓';
+        fdConn.send({ type:'ack' });
+        showToast('File received!');
+      }
+    });
+
+    fdConn.on('error', err => {
+      document.getElementById('fd-recv-status').textContent = 'Error: ' + err.message;
+    });
+    fdConn.on('close', () => {
+      document.getElementById('fd-recv-status').textContent = 'Disconnected.';
+    });
+  });
+
+  fdPeer.on('error', err => {
+    const msg = err.type === 'peer-unavailable'
+      ? 'Code not found — check the code and try again.'
+      : err.message;
+    document.getElementById('fd-recv-status').textContent = msg;
+  });
+}
+
+function fdDestroyPeer() {
+  try { if (fdConn) fdConn.close(); } catch(e){}
+  try { if (fdPeer) fdPeer.destroy(); } catch(e){}
+  fdConn = null; fdPeer = null;
+}
+
+function leaveFileDrop() {
+  // Don't destroy peer — keeps code alive if user comes back
+  showScreen('more');
+}
+
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 // INIT
