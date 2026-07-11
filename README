@@ -9,15 +9,15 @@ A lightweight, offline-capable PWA (Progressive Web App) for students. Stores al
 | File | Description |
 |------|-------------|
 | `index.html` | Main app — all UI, logic, and styles in one file |
-| `sw.js` | Service worker — enables offline use and asset caching |
-| `manifest.json` | PWA manifest — allows "Add to Home Screen" on mobile |
+| `sw.js` | Service worker — enables offline use, asset caching, and share target handling |
+| `manifest.json` | PWA manifest — allows "Add to Home Screen" and system share sheet integration |
 | `icon.png` | App icon (512×512) |
 
 ---
 
 ## Features
 
-### 📷 Pictures
+### 📷 Gallery
 - Organize photos into named albums
 - Upload multiple photos at once (tap or drag & drop)
 - Assign photos to albums on upload, or move them later
@@ -27,17 +27,35 @@ A lightweight, offline-capable PWA (Progressive Web App) for students. Stores al
 - Delete or move photos from the lightbox options menu
 
 ### 📝 Notes
-- Create and edit freeform text notes
+- Create and edit rich-text notes
+- Formatting toolbar: Undo/Redo, Bold, Italic, Underline, Strikethrough, font size (S/M/L/H), text color, and clear formatting
 - Notes auto-save while typing (800ms debounce)
 - Rename or delete notes from the gear icon on each card
 - Notes are sorted by last modified date
 
-### 🗺️ Backtracker
+### ⋯ More
+
+#### 🗺️ Backtracker
 - Records your GPS path as a polyline on a live map (OpenStreetMap)
 - Start / Stop tracking with one button
 - Snap-to-location button recenters the map on your current position
-- Reset button clears the recorded path
+- Reset button (circular, below compass) clears the recorded path
 - Compass overlay shows device heading (requires device orientation permission on iOS)
+
+#### 📡 FileDrop
+- Send files directly between two devices peer-to-peer (no server, no account)
+- Uses WebRTC via PeerJS — sender generates a 4-character code, receiver enters it to connect
+- Progress bar on both sender and receiver
+- Works across WiFi and mobile data; both devices on the same WiFi may route locally
+- Recommended max file size: 100 MB
+- Requires an internet connection for the initial handshake (PeerJS signaling), after which transfer is peer-to-peer
+
+#### 📥 Receiver
+- Receives files shared to CatNon Helper from other apps (Photos, Files, Chrome, etc.)
+- When a file is shared to the app, it opens automatically and the file appears in Receiver
+- Each file shows its name, size, and received date
+- Options to Save (download to device) or delete each file
+- Requires the app to be installed as a PWA (Add to Home Screen) — not available in browser tab
 
 ---
 
@@ -49,9 +67,10 @@ All data is stored in the browser's **IndexedDB** under the database `CatNonHelp
 |-------|----------|
 | `photos` | Photo entries with base64 image data, album assignment, and date |
 | `albums` | Album names, sort order, and creation date |
-| `notes` | Note title, body, and timestamps |
+| `notes` | Note title, rich-text body (HTML), and timestamps |
+| `inbox` | Files received via the system share sheet (name, MIME type, size, binary data) |
 
-Current DB version: **4**
+Current DB version: **5**
 
 > Clearing browser site data or using a different browser will erase all stored content. There is no cloud backup.
 
@@ -63,9 +82,12 @@ The service worker (`sw.js`) caches the app shell on first load, including:
 - `index.html`
 - `manifest.json`
 - Leaflet map library (CSS + JS)
+- PeerJS library
 - Google Fonts
 
-After the first visit the app works fully offline, except for map tiles (those require a connection to load new areas).
+After the first visit the app works fully offline, except for map tiles (those require a connection to load new areas) and FileDrop (requires internet for the initial peer handshake).
+
+Navigation requests (opening the app) are always fetched fresh from the network when online, falling back to cache when offline.
 
 ---
 
@@ -81,11 +103,15 @@ After the first visit the app works fully offline, except for map tiles (those r
 2. Tap the Share button → "Add to Home Screen"
 3. Confirm — the app opens without browser UI
 
+> The Receiver feature and system share sheet integration only work after installing as a PWA.
+
 ---
 
 ## Browser Compatibility
 
-Requires a modern browser with IndexedDB support. Chrome is recommended. Safari works but requires user permission for device orientation (compass feature).
+Chrome (Android) is recommended. Safari (iOS 17+) is supported but has some limitations:
+- Device orientation (compass) requires explicit user permission
+- Share Target / Receiver may behave differently on older iOS versions
 
 ---
 
@@ -93,5 +119,6 @@ Requires a modern browser with IndexedDB support. Chrome is recommended. Safari 
 
 - Photos are stored as base64 in IndexedDB — large photo libraries may hit browser storage limits
 - Map tiles do not cache offline (only the map library itself is cached)
-- No export or backup functionality
-- Single-user, single-device only
+- FileDrop and Receiver require an internet connection for the initial peer handshake
+- No export or cloud backup functionality
+- Single-user, single-device data (no sync between browsers or devices)
