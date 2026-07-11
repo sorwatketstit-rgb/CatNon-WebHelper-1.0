@@ -1,5 +1,5 @@
 {
-  "name": "CatNon Helper",
+  "name": "CatNon School Helper",
   "short_name": "CatNon Helper",
   "start_url": "./index.html",
   "display": "standalone",
@@ -12,5 +12,18 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "share_target": {
+    "action": "./index.html",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "file",
+          "accept": ["*/*"]
+        }
+      ]
+    }
+  }
 }
