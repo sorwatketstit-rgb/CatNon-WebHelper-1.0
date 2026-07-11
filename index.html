@@ -1501,13 +1501,20 @@ function checkReceiverEmpty() {
 // On app load: if redirected from a share, go straight to Receiver
 function checkSharedOnLoad() {
   if (location.search.includes('shared=1')) {
-    // Clear the query string without reload
     history.replaceState(null, '', location.pathname);
-    // Wait for DB to be ready then open inbox
     showScreen('receiver');
     showToast('File received — check your Receiver');
   }
 }
+
+// Also handle the case where the app was already open when the share happened
+// SW sends a postMessage so we can navigate without relying on the redirect
+navigator.serviceWorker.addEventListener('message', e => {
+  if (e.data && e.data.type === 'SHARE_RECEIVED') {
+    showScreen('receiver');
+    showToast('File received — check your Receiver');
+  }
+});
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 
