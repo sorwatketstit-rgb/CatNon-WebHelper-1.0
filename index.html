@@ -210,19 +210,23 @@
   .fd-recv-file-name{flex:1;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .fd-recv-file-dl{font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;flex-shrink:0;}
 
-  /* INBOX */
-  .receiver-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;color:var(--text-dimmer);padding:40px;}
-  .receiver-empty svg{width:40px;height:40px;opacity:0.3;}
-  .receiver-list{display:flex;flex-direction:column;padding:8px 16px 40px;gap:8px;overflow-y:auto;flex:1;}
-  .receiver-item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;}
-  .receiver-item-icon{width:36px;height:36px;background:var(--surface2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);}
-  .receiver-item-icon svg{width:18px;height:18px;}
-  .receiver-item-info{flex:1;min-width:0;}
-  .receiver-item-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .receiver-item-meta{font-size:11px;color:var(--text-dimmer);margin-top:2px;}
-  .receiver-item-actions{display:flex;gap:6px;flex-shrink:0;}
-  .receiver-dl-btn{font-size:12px;font-weight:600;color:var(--accent);background:none;border:none;cursor:pointer;padding:6px;}
-  .receiver-del-btn{font-size:12px;color:var(--danger);background:none;border:none;cursor:pointer;padding:6px;}
+  /* IMAGE TO PDF */
+  .imgpdf-body{display:flex;flex-direction:column;gap:16px;padding:16px 16px 40px;overflow-y:auto;flex:1;}
+  .imgpdf-drop{border:2px dashed var(--border);border-radius:var(--radius);padding:32px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:border-color 0.15s;color:var(--text-dim);}
+  .imgpdf-drop:active,.imgpdf-drop.dragover{border-color:var(--accent);color:var(--accent);}
+  .imgpdf-drop svg{width:32px;height:32px;opacity:0.6;}
+  .imgpdf-drop-label{font-size:14px;font-weight:500;}
+  .imgpdf-drop-sub{font-size:12px;color:var(--text-dimmer);}
+  .imgpdf-drop-formats{font-size:11px;color:var(--text-dimmer);opacity:0.7;text-align:center;line-height:1.5;}
+  .imgpdf-list{display:flex;flex-direction:column;gap:8px;}
+  .imgpdf-item{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;}
+  .imgpdf-thumb{width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--surface2);}
+  .imgpdf-item-name{flex:1;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .imgpdf-item-del{background:none;border:none;color:var(--danger);cursor:pointer;padding:6px;font-size:16px;flex-shrink:0;}
+  .imgpdf-actions{display:flex;gap:8px;}
+  .imgpdf-export-btn{flex:1;padding:14px;border-radius:var(--radius);border:none;background:var(--accent);color:#000;font-size:15px;font-weight:600;cursor:pointer;transition:opacity 0.15s;}
+  .imgpdf-export-btn:disabled{opacity:0.35;cursor:not-allowed;}
+  .imgpdf-clear-btn{padding:14px 18px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text-dim);font-size:14px;font-weight:500;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -385,8 +389,8 @@
       <span class="more-list-item-name">FileDrop</span>
       <span class="more-list-item-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
-    <button class="more-list-item" onclick="showScreen('receiver')" id="more-receiver-btn">
-      <span class="more-list-item-name">Receiver</span>
+    <button class="more-list-item" onclick="showScreen('imgpdf')">
+      <span class="more-list-item-name">Image to PDF</span>
       <span class="more-list-item-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
   </div>
@@ -448,15 +452,28 @@
   </div>
 </div>
 
-<!-- INBOX SCREEN -->
-<div class="screen" id="screen-receiver">
+<!-- IMAGE TO PDF SCREEN -->
+<div class="screen" id="screen-imgpdf">
   <div class="topbar">
     <button class="back-btn" onclick="showScreen('more')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
-    <span class="topbar-title">Receiver</span>
+    <span class="topbar-title">Image to PDF</span>
   </div>
-  <div id="receiver-content" style="display:flex;flex-direction:column;flex:1;overflow:hidden;"></div>
+  <div class="imgpdf-body">
+    <div class="imgpdf-drop" id="imgpdf-drop" onclick="document.getElementById('imgpdf-input').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <div class="imgpdf-drop-label">Tap to add images</div>
+      <div class="imgpdf-drop-sub">Each image becomes one page in the PDF</div>
+      <div class="imgpdf-drop-formats">Supports PNG · JPG · WEBP · GIF · BMP · HEIC (iOS)</div>
+    </div>
+    <input type="file" id="imgpdf-input" accept="image/*" multiple style="display:none" onchange="imgpdfAdd(this.files)">
+    <div class="imgpdf-list" id="imgpdf-list"></div>
+    <div class="imgpdf-actions">
+      <button class="imgpdf-export-btn" id="imgpdf-export-btn" onclick="imgpdfExport()" disabled>Export PDF</button>
+      <button class="imgpdf-clear-btn" onclick="imgpdfClear()">Clear</button>
+    </div>
+  </div>
 </div>
 
 <!-- BOTTOM NAV -->
@@ -607,13 +624,14 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
 // ══════════════════════════════════════
 //  DATABASE
 // ══════════════════════════════════════
 let db;
 const DB_NAME = 'CatNonHelperDB';
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 
 function initDB() {
   return new Promise((resolve, reject) => {
@@ -631,9 +649,9 @@ function initDB() {
         d.deleteObjectStore('homework');
       if (!d.objectStoreNames.contains('notes'))
         d.createObjectStore('notes',{keyPath:'id',autoIncrement:true});
-      // v5: inbox for files shared from other apps via Share Target API
-      if (!d.objectStoreNames.contains('inbox'))
-        d.createObjectStore('inbox',{keyPath:'id',autoIncrement:true});
+      // v6: remove inbox store (Receiver feature removed)
+      if (d.objectStoreNames.contains('inbox'))
+        d.deleteObjectStore('inbox');
     };
     req.onsuccess = e => { db = e.target.result; resolve(); };
     req.onerror = () => reject(req.error);
@@ -676,17 +694,17 @@ function showScreen(name, albumId=null) {
   document.getElementById(`screen-${name}`).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   // backtracker and filedrop are children of More — keep More tab highlighted
-  const navMap={pictures:'nav-pictures',notes:'nav-notes',more:'nav-more',backtracker:'nav-more',filedrop:'nav-more',receiver:'nav-more'};
+  const navMap={pictures:'nav-pictures',notes:'nav-notes',more:'nav-more',backtracker:'nav-more',filedrop:'nav-more',imgpdf:'nav-more'};
   if (navMap[name]) document.getElementById(navMap[name]).classList.add('active');
   // hide nav for full-screen sub-screens
-  const hideNav=['album-detail','upload','backtracker','filedrop','receiver'];
+  const hideNav=['album-detail','upload','backtracker','filedrop','imgpdf'];
   document.querySelector('.bottom-nav').style.display=hideNav.includes(name)?'none':'';
   if (name==='pictures') renderAlbums();
   if (name==='notes') renderNotes();
   if (name==='upload') initUploadScreen();
   if (name==='backtracker') initMap();
   if (name==='filedrop') initFileDrop();
-  if (name==='receiver') renderReceiver();
+  if (name==='imgpdf') initImgPdf();
   if (name==='album-detail' && albumId!==null) openAlbum(albumId);
 }
 
@@ -1417,109 +1435,129 @@ function leaveFileDrop() {
 
 
 // ══════════════════════════════════════
-//  INBOX  (files shared from other apps)
+//  IMAGE TO PDF  (client-side, jsPDF)
 // ══════════════════════════════════════
-function formatBytes(b) {
-  if (b < 1024) return b + ' B';
-  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
-  return (b/(1024*1024)).toFixed(1) + ' MB';
+let imgpdfFiles = []; // { file, dataUrl }
+
+function initImgPdf() {
+  // Reset UI when entering the screen
+  imgpdfFiles = [];
+  document.getElementById('imgpdf-list').innerHTML = '';
+  document.getElementById('imgpdf-export-btn').disabled = true;
+  imgpdfSetupDrop();
 }
 
-function formatDate(ts) {
-  return new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+function imgpdfSetupDrop() {
+  const zone = document.getElementById('imgpdf-drop');
+  zone.ondragover = e => { e.preventDefault(); zone.classList.add('dragover'); };
+  zone.ondragleave = () => zone.classList.remove('dragover');
+  zone.ondrop = e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    imgpdfAdd(e.dataTransfer.files);
+  };
 }
 
-function mimeIcon(mime) {
-  if (mime.startsWith('image/'))
-    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
-  if (mime.startsWith('video/'))
-    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
-  if (mime.startsWith('audio/'))
-    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+function imgpdfAdd(files) {
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    const reader = new FileReader();
+    reader.onload = e => {
+      imgpdfFiles.push({ file, dataUrl: e.target.result });
+      imgpdfRenderList();
+    };
+    reader.readAsDataURL(file);
+  }
+  // Reset input so same file can be added again if needed
+  document.getElementById('imgpdf-input').value = '';
 }
 
-async function renderReceiver() {
-  const container = document.getElementById('receiver-content');
-  const all = await dbGetAll('inbox');
-  if (!all.length) {
-    container.innerHTML = `<div class="receiver-empty">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
-      <div>No shared files yet</div>
-      <div style="font-size:12px;text-align:center;line-height:1.6;">Share a file to CatNon Helper<br>from any app to receive it here</div>
-    </div>`;
+function imgpdfRenderList() {
+  const list = document.getElementById('imgpdf-list');
+  list.innerHTML = '';
+  imgpdfFiles.forEach((entry, i) => {
+    const el = document.createElement('div');
+    el.className = 'imgpdf-item';
+    el.innerHTML = `
+      <img class="imgpdf-thumb" src="${entry.dataUrl}">
+      <span class="imgpdf-item-name">${entry.file.name}</span>
+      <button class="imgpdf-item-del" onclick="imgpdfRemove(${i})" title="Remove">✕</button>`;
+    list.appendChild(el);
+  });
+  document.getElementById('imgpdf-export-btn').disabled = imgpdfFiles.length === 0;
+}
+
+function imgpdfRemove(i) {
+  imgpdfFiles.splice(i, 1);
+  imgpdfRenderList();
+}
+
+function imgpdfClear() {
+  imgpdfFiles = [];
+  imgpdfRenderList();
+}
+
+async function imgpdfExport() {
+  if (!imgpdfFiles.length) return;
+  if (typeof window.jspdf === 'undefined') {
+    showToast('jsPDF not loaded — check connection');
     return;
   }
-  const list = document.createElement('div');
-  list.className = 'receiver-list';
-  for (const item of all.slice().reverse()) {
-    const el = document.createElement('div');
-    el.className = 'receiver-item';
-    el.dataset.id = item.id;
-    el.innerHTML = `
-      <div class="receiver-item-icon">${mimeIcon(item.mime||'')}</div>
-      <div class="receiver-item-info">
-        <div class="receiver-item-name">${item.name}</div>
-        <div class="receiver-item-meta">${formatBytes(item.size)} · ${formatDate(item.received)}</div>
-      </div>
-      <div class="receiver-item-actions">
-        <button class="receiver-dl-btn" onclick="receiverDownload(${item.id})" title="Download">↓ Save</button>
-        <button class="receiver-del-btn" onclick="receiverDelete(${item.id})" title="Delete">✕</button>
-      </div>`;
-    list.appendChild(el);
+  const btn = document.getElementById('imgpdf-export-btn');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+
+  try {
+    const { jsPDF } = window.jspdf;
+    let pdf = null;
+
+    for (const entry of imgpdfFiles) {
+      // Get natural image dimensions
+      const img = await new Promise((res, rej) => {
+        const i = new Image();
+        i.onload = () => res(i);
+        i.onerror = rej;
+        i.src = entry.dataUrl;
+      });
+
+      const imgW = img.naturalWidth;
+      const imgH = img.naturalHeight;
+      const isLandscape = imgW > imgH;
+      const pageW = isLandscape ? 297 : 210; // A4 mm
+      const pageH = isLandscape ? 210 : 297;
+
+      if (!pdf) {
+        pdf = new jsPDF({ orientation: isLandscape ? 'landscape' : 'portrait', unit:'mm', format:'a4' });
+      } else {
+        pdf.addPage('a4', isLandscape ? 'landscape' : 'portrait');
+      }
+
+      // Scale image to fill the page while keeping aspect ratio
+      const scale = Math.min(pageW / imgW, pageH / imgH);
+      const drawW = imgW * scale;
+      const drawH = imgH * scale;
+      const x = (pageW - drawW) / 2;
+      const y = (pageH - drawH) / 2;
+
+      const fmt = entry.file.type === 'image/png' ? 'PNG' : 'JPEG';
+      pdf.addImage(entry.dataUrl, fmt, x, y, drawW, drawH);
+    }
+
+    pdf.save('images.pdf');
+    showToast('PDF exported!');
+  } catch(err) {
+    showToast('Export failed: ' + err.message);
+    console.error(err);
   }
-  container.innerHTML = '';
-  container.appendChild(list);
-}
 
-async function receiverDownload(id) {
-  const item = await dbGet('inbox', id);
-  if (!item) return;
-  const blob = new Blob([item.data], { type: item.mime || 'application/octet-stream' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.download = item.name; a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  btn.textContent = 'Export PDF';
+  btn.disabled = false;
 }
-
-async function receiverDelete(id) {
-  await dbDelete('inbox', id);
-  // Remove item from list without full re-render
-  const el = document.querySelector(`.receiver-item[data-id="${id}"]`);
-  if (el) {
-    el.style.transition = 'opacity 0.2s';
-    el.style.opacity = '0';
-    setTimeout(() => { el.remove(); checkReceiverEmpty(); }, 200);
-  }
-}
-
-function checkReceiverEmpty() {
-  const list = document.querySelector('.receiver-list');
-  if (list && !list.children.length) renderReceiver();
-}
-
-// On app load: if redirected from a share, go straight to Receiver
-function checkSharedOnLoad() {
-  if (location.search.includes('shared=1')) {
-    history.replaceState(null, '', location.pathname);
-    showScreen('receiver');
-    showToast('File received — check your Receiver');
-  }
-}
-
-// Also handle the case where the app was already open when the share happened
-// SW sends a postMessage so we can navigate without relying on the redirect
-navigator.serviceWorker.addEventListener('message', e => {
-  if (e.data && e.data.type === 'SHARE_RECEIVED') {
-    showScreen('receiver');
-    showToast('File received — check your Receiver');
-  }
-});
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 // INIT
-initDB().then(()=>{checkSharedOnLoad();if(!location.search.includes('shared=1'))showScreen('pictures');}).catch(()=>{
+initDB().then(()=>{showScreen('pictures');}).catch(()=>{
   document.body.innerHTML='<div style="padding:40px;color:#ff4a4a;font-family:sans-serif;">Failed to initialize. Please use Chrome.</div>';
 });
 </script>
