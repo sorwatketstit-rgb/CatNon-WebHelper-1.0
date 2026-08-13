@@ -1,5 +1,5 @@
 CatNon School Helper
-A lightweight, offline-capable PWA (Progressive Web App) for students. Stores all data locally on the device — no account or internet connection required after the first load.
+A lightweight, Progressive Web App for students. Stores all data locally on the deviceo( no account or internet connection required after the first load).
 
 Files:
 - index.html: Main app. All UI, logic, and styles in one file
@@ -12,6 +12,7 @@ Gallery
 - Organize photos into named albums
 - Upload multiple photos at once (tap or drag & drop)
 - Assign photos to albums on upload, or move them later
+- Download saved photos
 - Albums have a custom sort order (lower number = shown first)
 - Uncategorized album collects any photos not assigned to a folder
 - Tap any photo to open a full-screen lightbox
@@ -39,34 +40,17 @@ FileDrop
 - Recommended max file size: 100 MB
 - Requires an internet connection for the initial handshake (PeerJS signaling), after which transfer is peer-to-peer
 
-Receiver
-- Receives files shared to CatNon Helper from other apps (Photos, Files, Chrome, etc.)
-- When a file is shared to the app, it opens automatically and the file appears in Receiver
-- Each file shows its name, size, and received date
-- Options to Save (download to device) or delete each file
-- Requires the app to be installed as a PWA (Add to Home Screen) — not available in browser tab
+Image to PDF
+- Convert any images straight into a PDF file format
+- Works with any amount of images as long as it does not hit the file size limit
+- Can not rotate images
+
+QR Code Generator
+- Creates a QR code to any link pasted, on scanned it will bring the user to the link pasted
+- Uses QR Code Generator plugin so no payment required.
 
 Data Storage
 All data is stored in the browser's **IndexedDB** under the database `CatNonHelperDB`. Nothing is sent to any server.
-
-- Photos: Photo entries with base64 image data, album assignment, and date
-- Albums: Album names, sort order, and creation date
-- Notes: Note title, rich-text body (HTML), and timestamps
-- Inbox: Files received via the system share sheet (name, MIME type, size, binary data)
-
-Current DB version: **5**
-> Clearing browser site data or using a different browser will erase all stored content. There is no cloud backup.
-
-Offline Support
-The service worker (sw.js) caches the app shell on first load, including:
-- index.html
-- manifest.json
-- Leaflet map library (CSS + JS)
-- PeerJS library
-- Google Fonts
-
-After the first visit the app works fully offline, except for map tiles (those require a connection to load new areas) and FileDrop (requires internet for the initial peer handshake).
-Navigation requests (opening the app) are always fetched fresh from the network when online, falling back to cache when offline.
 
 Installation (Add to Home Screen)
 - Android (Chrome):
@@ -78,8 +62,6 @@ Installation (Add to Home Screen)
 1. Open the app in Safari
 2. Tap the Share button -> "Add to Home Screen"
 3. Confirm: The app opens without browser UI
-
-> The Receiver feature and system share sheet integration only work after installing as a PWA.
 
 Browser Compatibility
 Chrome (Android) is recommended. Safari (iOS 17+) is supported but has some limitations:
