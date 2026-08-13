@@ -584,6 +584,7 @@
     <div class="modal-handle"></div>
     <div class="modal-title">Photo Options</div>
     <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn-secondary" onclick="saveCurrentPhoto()" style="text-align:left;padding:14px 16px;">💾 &nbsp; Save image</button>
       <button class="btn-secondary" onclick="movePhotoToAlbum()" style="text-align:left;padding:14px 16px;">📁 &nbsp; Move to album</button>
       <button class="btn-secondary" onclick="deleteCurrentPhoto()" style="text-align:left;padding:14px 16px;color:var(--danger);border-color:rgba(255,74,74,0.3);">🗑️ &nbsp; Delete photo</button>
     </div>
@@ -648,9 +649,14 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
     <span id="lightbox-label" style="font-size:13px;color:var(--text-dim);"></span>
-    <button class="icon-btn" onclick="openPhotoOptions()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-    </button>
+    <div style="display:flex;gap:4px;">
+      <button class="icon-btn" onclick="saveCurrentPhoto()" title="Save image">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <button class="icon-btn" onclick="openPhotoOptions()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+      </button>
+    </div>
   </div>
   <div class="lightbox-img-wrap"><img id="lightbox-img" src="" alt=""></div>
 </div>
@@ -1250,6 +1256,20 @@ async function openLightbox(photoId,inAlbum=false) {
 }
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lightbox-img').src='';}
 function openPhotoOptions(){openModal('modal-photo-options');}
+async function saveCurrentPhoto(){
+  const photo=await dbGet('photos',currentPhotoId);
+  if(!photo||!photo.dataUrl){showToast('Image not found');return;}
+  const match=/^data:image\/(\w+);/.exec(photo.dataUrl);
+  const ext=match?match[1].replace('jpeg','jpg'):'jpg';
+  const a=document.createElement('a');
+  a.href=photo.dataUrl;
+  a.download=`catnon-photo-${photo.id}.${ext}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  closeModal('modal-photo-options');
+  showToast('Image saved');
+}
 async function deleteCurrentPhoto(){
   closeModal('modal-photo-options');closeLightbox();
   await dbDelete('photos',currentPhotoId);showToast('Photo deleted');
