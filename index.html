@@ -359,7 +359,12 @@
 <!-- BACKTRACKER -->
 <div class="screen" id="screen-backtracker">
   <div class="tracker-controls">
-    <div class="tracker-title">Backtracker</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="back-btn" onclick="showScreen('more')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="tracker-title">Backtracker</div>
+    </div>
     <button id="track-btn" class="start" onclick="toggleTracking()">Start Tracking</button>
     <div class="tracker-status" id="tracker-status">Press Start to begin recording your path</div>
   </div>
