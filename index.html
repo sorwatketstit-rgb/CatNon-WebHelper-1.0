@@ -162,6 +162,18 @@
   .lightbox-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(0,0,0,0.5);position:absolute;top:0;left:0;right:0;z-index:1;}
   .lightbox-img-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;}
   .lightbox-img-wrap img{max-width:100%;max-height:100%;object-fit:contain;user-select:none;}
+  .imgpdf-preview{display:none;position:fixed;inset:0;background:#000;z-index:150;flex-direction:column;}
+  .imgpdf-preview.open{display:flex;}
+  .imgpdf-preview-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(0,0,0,0.5);position:relative;z-index:1;flex-shrink:0;}
+  .imgpdf-preview-img-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:16px;}
+  .imgpdf-preview-img-wrap img{max-width:100%;max-height:100%;object-fit:contain;user-select:none;transition:transform 0.2s ease;}
+  .imgpdf-preview-rotate-row{display:flex;justify-content:center;gap:16px;padding:8px 20px;flex-shrink:0;}
+  .imgpdf-preview-rotate-btn{width:48px;height:48px;border-radius:50%;background:var(--surface2);border:none;color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .imgpdf-preview-rotate-btn:active{background:var(--border);}
+  .imgpdf-preview-nav-row{display:flex;align-items:center;gap:10px;padding:14px 20px calc(20px + env(safe-area-inset-bottom));flex-shrink:0;}
+  .imgpdf-preview-nav-btn{flex:1;padding:14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-weight:500;cursor:pointer;}
+  .imgpdf-preview-nav-btn:disabled{opacity:0.35;cursor:not-allowed;}
+  .imgpdf-preview-save-btn{flex:1;padding:14px;border-radius:var(--radius);border:none;background:var(--accent);color:#000;font-size:15px;font-weight:600;cursor:pointer;}
 
   /* TOAST & LOADING */
   .toast{position:fixed;bottom:calc(var(--nav-height)+12px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 18px;font-size:13px;color:var(--text);z-index:500;opacity:0;transition:opacity 0.2s,transform 0.2s;white-space:nowrap;pointer-events:none;}
@@ -492,7 +504,7 @@
     <input type="file" id="imgpdf-input" accept="image/*" multiple style="display:none" onchange="imgpdfAdd(this.files)">
     <div class="imgpdf-list" id="imgpdf-list"></div>
     <div class="imgpdf-actions">
-      <button class="imgpdf-export-btn" id="imgpdf-export-btn" onclick="imgpdfExport()" disabled>Export PDF</button>
+      <button class="imgpdf-export-btn" id="imgpdf-export-btn" onclick="imgpdfOpenPreview()" disabled>Preview &amp; Export</button>
       <button class="imgpdf-clear-btn" onclick="imgpdfClear()">Clear</button>
     </div>
   </div>
@@ -664,6 +676,31 @@
     </div>
   </div>
   <div class="lightbox-img-wrap"><img id="lightbox-img" src="" alt=""></div>
+</div>
+
+<!-- IMAGE TO PDF PREVIEW -->
+<div class="imgpdf-preview" id="imgpdf-preview">
+  <div class="imgpdf-preview-topbar">
+    <button class="back-btn" onclick="imgpdfClosePreview()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <span id="imgpdf-preview-counter" style="font-size:13px;color:var(--text-dim);"></span>
+    <div style="width:36px;"></div>
+  </div>
+  <div class="imgpdf-preview-img-wrap"><img id="imgpdf-preview-img" src="" alt=""></div>
+  <div class="imgpdf-preview-rotate-row">
+    <button class="imgpdf-preview-rotate-btn" onclick="imgpdfRotate('ccw')" title="Rotate counterclockwise">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+    </button>
+    <button class="imgpdf-preview-rotate-btn" onclick="imgpdfRotate('cw')" title="Rotate clockwise">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-9"/></svg>
+    </button>
+  </div>
+  <div class="imgpdf-preview-nav-row">
+    <button class="imgpdf-preview-nav-btn" id="imgpdf-preview-prev" onclick="imgpdfPreviewPrev()">Back</button>
+    <button class="imgpdf-preview-nav-btn" id="imgpdf-preview-next" onclick="imgpdfPreviewNext()">Next</button>
+    <button class="imgpdf-preview-save-btn" id="imgpdf-preview-save" onclick="imgpdfSaveFromPreview()" style="display:none;">Save</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1528,7 +1565,7 @@ function imgpdfAdd(files) {
     if (!file.type.startsWith('image/')) continue;
     const reader = new FileReader();
     reader.onload = e => {
-      imgpdfFiles.push({ file, dataUrl: e.target.result });
+      imgpdfFiles.push({ file, dataUrl: e.target.result, rotation: 0 });
       imgpdfRenderList();
     };
     reader.readAsDataURL(file);
@@ -1562,6 +1599,82 @@ function imgpdfClear() {
   imgpdfRenderList();
 }
 
+// ---- Preview / rotate ----
+let imgpdfPreviewIndex = 0;
+
+function imgpdfOpenPreview() {
+  if (!imgpdfFiles.length) return;
+  imgpdfPreviewIndex = 0;
+  document.getElementById('imgpdf-preview').classList.add('open');
+  imgpdfRenderPreview();
+}
+
+function imgpdfClosePreview() {
+  document.getElementById('imgpdf-preview').classList.remove('open');
+  imgpdfRenderList(); // reflect any rotations in the thumbnail list
+}
+
+function imgpdfRenderPreview() {
+  const entry = imgpdfFiles[imgpdfPreviewIndex];
+  const img = document.getElementById('imgpdf-preview-img');
+  img.src = entry.dataUrl;
+  img.style.transform = `rotate(${entry.rotation}deg)`;
+  document.getElementById('imgpdf-preview-counter').textContent = `${imgpdfPreviewIndex + 1} / ${imgpdfFiles.length}`;
+
+  const isLast = imgpdfPreviewIndex === imgpdfFiles.length - 1;
+  document.getElementById('imgpdf-preview-prev').disabled = imgpdfPreviewIndex === 0;
+  document.getElementById('imgpdf-preview-next').style.display = isLast ? 'none' : '';
+  document.getElementById('imgpdf-preview-save').style.display = isLast ? '' : 'none';
+}
+
+function imgpdfRotate(dir) {
+  const entry = imgpdfFiles[imgpdfPreviewIndex];
+  const delta = dir === 'cw' ? 90 : -90;
+  entry.rotation = ((entry.rotation + delta) % 360 + 360) % 360;
+  const img = document.getElementById('imgpdf-preview-img');
+  img.style.transform = `rotate(${entry.rotation}deg)`;
+}
+
+function imgpdfPreviewPrev() {
+  if (imgpdfPreviewIndex === 0) return;
+  imgpdfPreviewIndex--;
+  imgpdfRenderPreview();
+}
+
+function imgpdfPreviewNext() {
+  if (imgpdfPreviewIndex >= imgpdfFiles.length - 1) return;
+  imgpdfPreviewIndex++;
+  imgpdfRenderPreview();
+}
+
+function imgpdfSaveFromPreview() {
+  document.getElementById('imgpdf-preview').classList.remove('open');
+  imgpdfRenderList();
+  imgpdfExport();
+}
+
+// Bakes an entry's rotation into actual pixel data (so width/height swap
+// correctly for 90°/270° turns) and returns a new data URL.
+function imgpdfApplyRotation(dataUrl, rotationDeg, mimeType) {
+  if (!rotationDeg) return Promise.resolve(dataUrl);
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const swap = rotationDeg === 90 || rotationDeg === 270;
+      const canvas = document.createElement('canvas');
+      canvas.width = swap ? img.naturalHeight : img.naturalWidth;
+      canvas.height = swap ? img.naturalWidth : img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(rotationDeg * Math.PI / 180);
+      ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+      resolve(canvas.toDataURL(mimeType === 'image/png' ? 'image/png' : 'image/jpeg', 0.95));
+    };
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
+}
+
 async function imgpdfExport() {
   if (!imgpdfFiles.length) return;
   if (typeof window.jspdf === 'undefined') {
@@ -1577,12 +1690,15 @@ async function imgpdfExport() {
     let pdf = null;
 
     for (const entry of imgpdfFiles) {
-      // Get natural image dimensions
+      // Bake in any rotation the user applied in preview
+      const rotatedDataUrl = await imgpdfApplyRotation(entry.dataUrl, entry.rotation, entry.file.type);
+
+      // Get natural image dimensions (post-rotation)
       const img = await new Promise((res, rej) => {
         const i = new Image();
         i.onload = () => res(i);
         i.onerror = rej;
-        i.src = entry.dataUrl;
+        i.src = rotatedDataUrl;
       });
 
       const imgW = img.naturalWidth;
@@ -1605,7 +1721,7 @@ async function imgpdfExport() {
       const y = (pageH - drawH) / 2;
 
       const fmt = entry.file.type === 'image/png' ? 'PNG' : 'JPEG';
-      pdf.addImage(entry.dataUrl, fmt, x, y, drawW, drawH);
+      pdf.addImage(rotatedDataUrl, fmt, x, y, drawW, drawH);
     }
 
     pdf.save('images.pdf');
@@ -1615,7 +1731,7 @@ async function imgpdfExport() {
     console.error(err);
   }
 
-  btn.textContent = 'Export PDF';
+  btn.textContent = 'Preview & Export';
   btn.disabled = false;
 }
 
