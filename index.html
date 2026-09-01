@@ -1653,10 +1653,13 @@ function imgpdfSaveFromPreview() {
   imgpdfExport();
 }
 
-// Bakes an entry's rotation into actual pixel data (so width/height swap
-// correctly for 90°/270° turns) and returns a new data URL.
+// Normalizes EXIF orientation and bakes in any manual rotation, so the
+// exported pixels always match what the <img> preview shows on screen.
+// (Raw JPEG bytes carry an EXIF orientation tag that browsers auto-apply
+// when *displaying* the image, but jsPDF's addImage ignores it and embeds
+// the untouched bytes — which is why the PDF came out rotated even when
+// the preview looked upright and no manual rotation was applied.)
 function imgpdfApplyRotation(dataUrl, rotationDeg, mimeType) {
-  if (!rotationDeg) return Promise.resolve(dataUrl);
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
