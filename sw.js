@@ -1,4 +1,4 @@
-const CACHE_NAME = 'catnon-helper-v4';
+const CACHE_NAME = 'catnon-helper-v5';
 const PRECACHE = [
   './',
   './index.html',

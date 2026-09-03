@@ -256,8 +256,70 @@
 </head>
 <body>
 
+<!-- HOME SCREEN -->
+<div class="screen active" id="screen-home">
+  <div class="topbar" style="padding-top:20px;padding-bottom:12px;">
+    <div>
+      <span class="topbar-title" style="font-size:32px;font-weight:700;letter-spacing:-0.5px;">CatNon Helper</span>
+      <div style="font-size:13px;color:var(--text-dim);margin-top:2px;">Offline PWA for Students</div>
+    </div>
+  </div>
+  <div class="scroll-area" style="padding:12px 16px 120px;">
+    <!-- STORAGE CARD -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:16px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/></svg>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:600;color:var(--text);">Storage Usage</div>
+            <div style="font-size:12px;color:var(--text-dim);" id="home-storage-sub">Calculating usage...</div>
+          </div>
+        </div>
+        <button class="icon-btn" onclick="updateHomeStorage()" title="Refresh storage">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-9"/></svg>
+        </button>
+      </div>
+
+      <!-- Storage Progress Bar -->
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;border:1px solid var(--border);">
+          <div id="home-storage-bar" style="height:100%;background:var(--accent);border-radius:4px;width:0%;transition:width 0.3s ease;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);">
+          <span id="home-storage-used">0 MB used</span>
+          <span id="home-storage-total">0 MB quota</span>
+        </div>
+      </div>
+
+      <!-- Storage Breakdown Grid -->
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding-top:12px;border-top:1px solid var(--border);">
+        <div style="background:var(--surface2);padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:4px;">
+          <span style="font-size:11px;color:var(--text-dim);">Photos Storage</span>
+          <span style="font-size:16px;font-weight:600;color:var(--text);" id="home-photo-count">0 items</span>
+          <span style="font-size:11px;color:var(--accent);" id="home-photo-size">0 KB</span>
+        </div>
+        <div style="background:var(--surface2);padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:4px;">
+          <span style="font-size:11px;color:var(--text-dim);">Notes Storage</span>
+          <span style="font-size:16px;font-weight:600;color:var(--text);" id="home-note-count">0 items</span>
+          <span style="font-size:11px;color:var(--accent);" id="home-note-size">0 KB</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO CARD -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:15px;font-weight:600;color:var(--text);">About CatNon Helper</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.6;">
+        All data is saved locally on your device in IndexedDB. No internet connection or account required.
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- PICTURES (album grid) -->
-<div class="screen active" id="screen-pictures">
+<div class="screen" id="screen-pictures">
   <div class="topbar">
     <span class="topbar-title">Pictures</span>
     <div class="topbar-actions">
@@ -310,6 +372,9 @@
 <!-- NOTES LIST -->
 <div class="screen" id="screen-notes">
   <div class="topbar">
+    <button class="back-btn" onclick="showScreen('more')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
     <span class="topbar-title">Notes</span>
     <div class="topbar-actions">
       <button class="icon-btn" onclick="createNote()">
@@ -411,6 +476,10 @@
     <span class="topbar-title">More</span>
   </div>
   <div class="more-list">
+    <button class="more-list-item" onclick="showScreen('notes')">
+      <span class="more-list-item-name">Notes</span>
+      <span class="more-list-item-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </button>
     <button class="more-list-item" onclick="showScreen('backtracker')">
       <span class="more-list-item-name">Backtracker</span>
       <span class="more-list-item-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
@@ -534,13 +603,13 @@
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="nav-item active" id="nav-pictures" onclick="showScreen('pictures')">
+  <button class="nav-item active" id="nav-home" onclick="showScreen('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="nav-label">Home</span>
+  </button>
+  <button class="nav-item" id="nav-pictures" onclick="showScreen('pictures')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
     <span class="nav-label">Gallery</span>
-  </button>
-  <button class="nav-item" id="nav-notes" onclick="showScreen('notes')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-    <span class="nav-label">Notes</span>
   </button>
   <button class="nav-item" id="nav-more" onclick="showScreen('more')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
@@ -764,7 +833,7 @@ function syncMeta() {
 // ══════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════
-let currentScreen = 'pictures';
+let currentScreen = 'home';
 let currentAlbumId = null;
 let currentPhotoId = null;
 let lightboxInAlbum = false;
@@ -772,20 +841,97 @@ let pendingFiles = [];
 let editingAlbumId = null;
 
 // ══════════════════════════════════════
-//  NAVIGATION
+//  NAVIGATION & HOME
 // ══════════════════════════════════════
+async function updateHomeStorage() {
+  try {
+    const subEl = document.getElementById('home-storage-sub');
+    const barEl = document.getElementById('home-storage-bar');
+    const usedEl = document.getElementById('home-storage-used');
+    const totalEl = document.getElementById('home-storage-total');
+    const photoCountEl = document.getElementById('home-photo-count');
+    const photoSizeEl = document.getElementById('home-photo-size');
+    const noteCountEl = document.getElementById('home-note-count');
+    const noteSizeEl = document.getElementById('home-note-size');
+
+    if (subEl) subEl.textContent = 'Calculating usage...';
+
+    let quotaBytes = 0, usageBytes = 0;
+    if (navigator.storage && navigator.storage.estimate) {
+      const estimate = await navigator.storage.estimate();
+      usageBytes = estimate.usage || 0;
+      quotaBytes = estimate.quota || 0;
+    }
+
+    const photos = await dbGetAll('photos');
+    const notes = await dbGetAll('notes');
+
+    let photosBytes = 0;
+    photos.forEach(p => { if (p.dataUrl) photosBytes += p.dataUrl.length; });
+
+    let notesBytes = 0;
+    notes.forEach(n => {
+      if (n.title) notesBytes += n.title.length;
+      if (n.content) notesBytes += n.content.length;
+    });
+
+    const formatBytes = (bytes) => {
+      if (!bytes || bytes <= 0) return '0 KB';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+      return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+    };
+
+    if (photoCountEl) photoCountEl.textContent = `${photos.length} item${photos.length === 1 ? '' : 's'}`;
+    if (photoSizeEl) photoSizeEl.textContent = formatBytes(photosBytes);
+    if (noteCountEl) noteCountEl.textContent = `${notes.length} item${notes.length === 1 ? '' : 's'}`;
+    if (noteSizeEl) noteSizeEl.textContent = formatBytes(notesBytes);
+
+    const totalUsedDisplay = formatBytes(usageBytes || (photosBytes + notesBytes));
+    const totalQuotaDisplay = quotaBytes ? formatBytes(quotaBytes) : 'Local storage';
+
+    if (usedEl) usedEl.textContent = `${totalUsedDisplay} used`;
+    if (totalEl) totalEl.textContent = quotaBytes ? `${totalQuotaDisplay} quota` : 'Local storage';
+
+    let percent = 0;
+    if (quotaBytes && quotaBytes > 0) {
+      percent = Math.min(100, Math.max(0.5, (usageBytes / quotaBytes) * 100));
+      if (subEl) subEl.textContent = `${percent.toFixed(1)}% of available storage used`;
+    } else {
+      percent = 5;
+      if (subEl) subEl.textContent = `${totalUsedDisplay} stored locally`;
+    }
+
+    if (barEl) barEl.style.width = percent + '%';
+  } catch (err) {
+    console.error('Failed to update storage stats:', err);
+  }
+}
+
 function showScreen(name, albumId=null) {
   currentScreen = name;
   if (name==='pictures') currentAlbumId=null;
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(`screen-${name}`).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  // backtracker and filedrop are children of More — keep More tab highlighted
-  const navMap={pictures:'nav-pictures',notes:'nav-notes',more:'nav-more',backtracker:'nav-more',filedrop:'nav-more',imgpdf:'nav-more',qr:'nav-more'};
+
+  const navMap = {
+    home: 'nav-home',
+    pictures: 'nav-pictures',
+    more: 'nav-more',
+    notes: 'nav-more',
+    backtracker: 'nav-more',
+    filedrop: 'nav-more',
+    imgpdf: 'nav-more',
+    qr: 'nav-more'
+  };
   if (navMap[name]) document.getElementById(navMap[name]).classList.add('active');
-  // hide nav for full-screen sub-screens
-  const hideNav=['album-detail','upload','backtracker','filedrop','imgpdf','qr'];
-  document.querySelector('.bottom-nav').style.display=hideNav.includes(name)?'none':'';
+
+  const hideNav = ['album-detail', 'upload', 'note-detail', 'backtracker', 'filedrop', 'imgpdf', 'qr', 'notes'];
+  document.querySelector('.bottom-nav').style.display = hideNav.includes(name) ? 'none' : '';
+
+  if (name==='home') updateHomeStorage();
   if (name==='pictures') renderAlbums();
   if (name==='notes') renderNotes();
   if (name==='upload') initUploadScreen();
@@ -1653,16 +1799,181 @@ function imgpdfSaveFromPreview() {
   imgpdfExport();
 }
 
+async function imgpdfExportNativeFallback() {
+  const pageBlobs = [];
+  for (const entry of imgpdfFiles) {
+    const rotatedDataUrl = await imgpdfApplyRotation(entry.dataUrl, entry.rotation, entry.file.type);
+    const img = await new Promise((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = rej;
+      i.src = rotatedDataUrl;
+    });
+
+    const imgW = img.naturalWidth || img.width;
+    const imgH = img.naturalHeight || img.height;
+    const isLandscape = imgW > imgH;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = imgW;
+    canvas.height = imgH;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+
+    const jpegUrl = canvas.toDataURL('image/jpeg', 0.92);
+    const base64Data = jpegUrl.split(',')[1];
+    const binaryStr = atob(base64Data);
+    const bytes = new Uint8Array(binaryStr.length);
+    for (let i = 0; i < binaryStr.length; i++) {
+      bytes[i] = binaryStr.charCodeAt(i);
+    }
+
+    pageBlobs.push({
+      bytes,
+      imgW,
+      imgH,
+      isLandscape,
+      pageW: isLandscape ? 841.89 : 595.28,
+      pageH: isLandscape ? 595.28 : 841.89
+    });
+  }
+
+  let pdfParts = [];
+  let offsets = [0];
+  let currentOffset = 0;
+
+  function addStr(str) {
+    pdfParts.push(str);
+    currentOffset += str.length;
+  }
+
+  function addBytes(arr) {
+    pdfParts.push(arr);
+    currentOffset += arr.length;
+  }
+
+  addStr("%PDF-1.4\n%\xFF\xFF\xFF\xFF\n");
+
+  const numPages = pageBlobs.length;
+  const catalogObjId = 1;
+  const pagesObjId = 2;
+  const pageObjIds = [];
+  for (let i = 0; i < numPages; i++) pageObjIds.push(3 + i * 3);
+
+  offsets[catalogObjId] = currentOffset;
+  addStr(`${catalogObjId} 0 obj\n<< /Type /Catalog /Pages ${pagesObjId} 0 R >>\nendobj\n`);
+
+  offsets[pagesObjId] = currentOffset;
+  addStr(`${pagesObjId} 0 obj\n<< /Type /Pages /Kids [${pageObjIds.map(id => id + ' 0 R').join(' ')}] /Count ${numPages} >>\nendobj\n`);
+
+  for (let i = 0; i < numPages; i++) {
+    const page = pageBlobs[i];
+    const pageObjId = 3 + i * 3;
+    const imageObjId = 4 + i * 3;
+    const contentObjId = 5 + i * 3;
+
+    const scale = Math.min(page.pageW / page.imgW, page.pageH / page.imgH);
+    const drawW = page.imgW * scale;
+    const drawH = page.imgH * scale;
+    const x = (page.pageW - drawW) / 2;
+    const y = (page.pageH - drawH) / 2;
+
+    offsets[pageObjId] = currentOffset;
+    addStr(`${pageObjId} 0 obj\n<< /Type /Page /Parent ${pagesObjId} 0 R /MediaBox [0 0 ${page.pageW.toFixed(2)} ${page.pageH.toFixed(2)}] /Resources << /XObject << /Im1 ${imageObjId} 0 R >> >> /Contents ${contentObjId} 0 R >>\nendobj\n`);
+
+    offsets[imageObjId] = currentOffset;
+    const imgHeader = `${imageObjId} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${page.imgW} /Height ${page.imgH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${page.bytes.length} >>\nstream\n`;
+    addStr(imgHeader);
+    addBytes(page.bytes);
+    addStr(`\nendstream\nendobj\n`);
+
+    const streamContent = `q ${drawW.toFixed(2)} 0 0 ${drawH.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)} cm /Im1 Do Q\n`;
+    offsets[contentObjId] = currentOffset;
+    addStr(`${contentObjId} 0 obj\n<< /Length ${streamContent.length} >>\nstream\n${streamContent}endstream\nendobj\n`);
+  }
+
+  const startXref = currentOffset;
+  const totalObjs = 1 + numPages * 3;
+  addStr(`xref\n0 ${totalObjs + 1}\n0000000000 65535 f \n`);
+
+  for (let i = 1; i <= totalObjs; i++) {
+    const offStr = String(offsets[i]).padStart(10, '0');
+    addStr(`${offStr} 00000 n \n`);
+  }
+
+  addStr(`trailer\n<< /Size ${totalObjs + 1} /Root ${catalogObjId} 0 R >>\nstartxref\n${startXref}\n%%EOF\n`);
+
+  const blobParts = pdfParts.map(part => typeof part === 'string' ? new TextEncoder().encode(part) : part);
+  const pdfBlob = new Blob(blobParts, { type: 'application/pdf' });
+  const downloadUrl = URL.createObjectURL(pdfBlob);
+  const a = document.createElement('a');
+  a.href = downloadUrl;
+  a.download = 'images.pdf';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(downloadUrl);
+}
+
+async function imgpdfExport() {
+  if (!imgpdfFiles.length) return;
+  const btn = document.getElementById('imgpdf-export-btn');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+
+  try {
+    const jsPDFClass = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
+
+    if (jsPDFClass) {
+      let pdf = null;
+      for (const entry of imgpdfFiles) {
+        const rotatedDataUrl = await imgpdfApplyRotation(entry.dataUrl, entry.rotation, entry.file.type);
+        const img = await new Promise((res, rej) => {
+          const i = new Image();
+          i.onload = () => res(i);
+          i.onerror = rej;
+          i.src = rotatedDataUrl;
+        });
+
+        const imgW = img.naturalWidth;
+        const imgH = img.naturalHeight;
+        const isLandscape = imgW > imgH;
+        const pageW = isLandscape ? 297 : 210;
+        const pageH = isLandscape ? 210 : 297;
+
+        if (!pdf) {
+          pdf = new jsPDFClass({ orientation: isLandscape ? 'landscape' : 'portrait', unit:'mm', format:'a4' });
+        } else {
+          pdf.addPage('a4', isLandscape ? 'landscape' : 'portrait');
+        }
+
+        const scale = Math.min(pageW / imgW, pageH / imgH);
+        const drawW = imgW * scale;
+        const drawH = imgH * scale;
+        const x = (pageW - drawW) / 2;
+        const y = (pageH - drawH) / 2;
+
+        const fmt = entry.file.type === 'image/png' ? 'PNG' : 'JPEG';
+        pdf.addImage(rotatedDataUrl, fmt, x, y, drawW, drawH);
+      }
+      pdf.save('images.pdf');
+      showToast('PDF exported!');
+    } else {
+      await imgpdfExportNativeFallback();
+      showToast('PDF exported (offline mode)!');
+    }
+  } catch(err) {
+    showToast('Export failed: ' + err.message);
+    console.error(err);
+  }
+
+  btn.textContent = 'Preview & Export';
+  btn.disabled = false;
+}
+
 // Normalizes EXIF orientation and bakes in any manual rotation, so the
 // exported pixels always match what the <img> preview shows on screen.
-// (Raw JPEG bytes carry an EXIF orientation tag that browsers auto-apply
-// when *displaying* the image, but jsPDF's addImage ignores it and embeds
-// the untouched bytes — which is why the PDF came out rotated even when
-// the preview looked upright and no manual rotation was applied.)
 async function imgpdfApplyRotation(dataUrl, rotationDeg, mimeType) {
-  // Decode the source with EXIF orientation applied, then bake the user's
-  // manual rotation into the pixels. jsPDF does not reliably honor JPEG EXIF
-  // orientation, so exporting the original JPEG bytes can rotate images.
   const response = await fetch(dataUrl);
   const blob = await response.blob();
   let source;
@@ -1696,66 +2007,6 @@ async function imgpdfApplyRotation(dataUrl, rotationDeg, mimeType) {
   return canvas.toDataURL(mimeType === 'image/png' ? 'image/png' : 'image/jpeg', 0.95);
 }
 
-async function imgpdfExport() {
-  if (!imgpdfFiles.length) return;
-  if (typeof window.jspdf === 'undefined') {
-    showToast('jsPDF not loaded — check connection');
-    return;
-  }
-  const btn = document.getElementById('imgpdf-export-btn');
-  btn.disabled = true;
-  btn.textContent = 'Generating…';
-
-  try {
-    const { jsPDF } = window.jspdf;
-    let pdf = null;
-
-    for (const entry of imgpdfFiles) {
-      // Bake in any rotation the user applied in preview
-      const rotatedDataUrl = await imgpdfApplyRotation(entry.dataUrl, entry.rotation, entry.file.type);
-
-      // Get natural image dimensions (post-rotation)
-      const img = await new Promise((res, rej) => {
-        const i = new Image();
-        i.onload = () => res(i);
-        i.onerror = rej;
-        i.src = rotatedDataUrl;
-      });
-
-      const imgW = img.naturalWidth;
-      const imgH = img.naturalHeight;
-      const isLandscape = imgW > imgH;
-      const pageW = isLandscape ? 297 : 210; // A4 mm
-      const pageH = isLandscape ? 210 : 297;
-
-      if (!pdf) {
-        pdf = new jsPDF({ orientation: isLandscape ? 'landscape' : 'portrait', unit:'mm', format:'a4' });
-      } else {
-        pdf.addPage('a4', isLandscape ? 'landscape' : 'portrait');
-      }
-
-      // Scale image to fill the page while keeping aspect ratio
-      const scale = Math.min(pageW / imgW, pageH / imgH);
-      const drawW = imgW * scale;
-      const drawH = imgH * scale;
-      const x = (pageW - drawW) / 2;
-      const y = (pageH - drawH) / 2;
-
-      const fmt = entry.file.type === 'image/png' ? 'PNG' : 'JPEG';
-      pdf.addImage(rotatedDataUrl, fmt, x, y, drawW, drawH);
-    }
-
-    pdf.save('images.pdf');
-    showToast('PDF exported!');
-  } catch(err) {
-    showToast('Export failed: ' + err.message);
-    console.error(err);
-  }
-
-  btn.textContent = 'Preview & Export';
-  btn.disabled = false;
-}
-
 
 // ══════════════════════════════════════
 //  QR CODE  (client-side, qrcode-generator lib, inlined below)
@@ -1783,9 +2034,10 @@ function qrShowPlaceholder(msg) {
 function qrGenerate() {
   const text = document.getElementById('qr-input').value.trim();
   if (!text) { qrShowPlaceholder(); return; }
-  if (typeof qrcode === 'undefined') { qrShowPlaceholder('QR engine failed to load'); return; }
+  const engine = window.qrcode || (typeof qrcode !== 'undefined' ? qrcode : null);
+  if (!engine) { qrShowPlaceholder('QR engine failed to load'); return; }
   try {
-    const qr = qrcode(0, 'M'); // typeNumber 0 = auto-size, level M = 15% error correction
+    const qr = engine(0, 'M');
     qr.addData(text);
     qr.make();
     document.getElementById('qr-preview-box').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 4, scalable: true });
@@ -1793,7 +2045,7 @@ function qrGenerate() {
     document.getElementById('qr-download-btn').disabled = false;
   } catch(err) {
     console.error(err);
-    qrShowPlaceholder('Text too long for a QR code');
+    qrShowPlaceholder('Could not generate QR code');
   }
 }
 
@@ -1835,7 +2087,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 // INIT
-initDB().then(()=>{showScreen('pictures');}).catch(()=>{
+initDB().then(()=>{showScreen('home');}).catch(()=>{
   document.body.innerHTML='<div style="padding:40px;color:#ff4a4a;font-family:sans-serif;">Failed to initialize. Please use Chrome.</div>';
 });
 </script>
