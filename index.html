@@ -425,12 +425,97 @@
     <div class="fmt-swatch" style="background:#ffadad;" onclick="fmtColor('#ffadad')" title="Red"></div>
     <div class="fmt-swatch" style="background:#fdffb6;" onclick="fmtColor('#fdffb6')" title="Yellow"></div>
     <div class="fmt-swatch" style="background:#bdb2ff;" onclick="fmtColor('#bdb2ff')" title="Purple"></div>
-    <!-- Clear formatting -->
-    <button class="fmt-btn" onclick="fmtClear()" title="Clear formatting">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.5 20H4"/><path d="m16 6-8.5 8.5c-.83.83-.83 2.17 0 3L9 19"/><path d="m17.5 4.5 2 2"/><path d="M14 7 7 14"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
-    </button>
   </div>
   <div class="note-editor" id="note-body-input" contenteditable="true" data-placeholder="Start typing..."></div>
+</div>
+
+<!-- NETWORK INFO SCREEN -->
+<div class="screen" id="screen-netinfo">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('more')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span class="topbar-title">Network Info</span>
+    <button class="icon-btn" onclick="refreshNetInfo()" title="Refresh Network Info">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-9"/></svg>
+    </button>
+  </div>
+  <div class="scroll-area" style="padding:16px 16px 120px;display:flex;flex-direction:column;gap:16px;">
+    
+    <!-- STATUS & CONNECTION TYPE CARD -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div id="net-status-badge" style="width:40px;height:40px;border-radius:50%;background:rgba(74,255,138,0.15);color:var(--green);display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+          </div>
+          <div>
+            <div style="font-size:16px;font-weight:600;color:var(--text);" id="net-type-title">Checking Network...</div>
+            <div style="font-size:12px;color:var(--text-dim);" id="net-status-sub">Detecting signal type</div>
+          </div>
+        </div>
+        <span id="net-state-chip" style="font-size:11px;font-weight:600;padding:4px 10px;border-radius:12px;background:rgba(74,255,138,0.15);color:var(--green);">ONLINE</span>
+      </div>
+
+      <!-- SPEEDS & LATENCY GRID -->
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding-top:12px;border-top:1px solid var(--border);">
+        <div style="background:var(--surface2);padding:14px;border-radius:10px;display:flex;flex-direction:column;gap:4px;">
+          <span style="font-size:11px;color:var(--text-dim);">Downlink Speed</span>
+          <span style="font-size:18px;font-weight:700;color:var(--accent);" id="net-downlink">0 Mbps</span>
+          <span style="font-size:10px;color:var(--text-dimmer);">Est. bandwidth</span>
+        </div>
+        <div style="background:var(--surface2);padding:14px;border-radius:10px;display:flex;flex-direction:column;gap:4px;">
+          <span style="font-size:11px;color:var(--text-dim);">Latency (RTT)</span>
+          <span style="font-size:18px;font-weight:700;color:var(--accent);" id="net-rtt">0 ms</span>
+          <span style="font-size:10px;color:var(--text-dimmer);">Ping response</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPEED CHECK / MEASUREMENT CARD -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:14px;">
+      <div style="font-size:15px;font-weight:600;color:var(--text);">Live Speed Check</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.5;">
+        Test current data transfer rate and response time over your mobile signal (4G/5G) or Wi-Fi connection.
+      </div>
+      
+      <!-- SPEED TEST RESULTS DISPLAY -->
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:4px;">
+        <div style="background:var(--surface2);padding:12px;border-radius:8px;text-align:center;">
+          <div style="font-size:10px;color:var(--text-dim);margin-bottom:2px;">DOWNLOAD RATE</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text);" id="speed-download-val">—</div>
+        </div>
+        <div style="background:var(--surface2);padding:12px;border-radius:8px;text-align:center;">
+          <div style="font-size:10px;color:var(--text-dim);margin-bottom:2px;">PING LATENCY</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text);" id="speed-ping-val">—</div>
+        </div>
+      </div>
+
+      <button id="net-speed-btn" onclick="runSpeedTest()" style="width:100%;padding:14px;background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity 0.15s;margin-top:4px;">
+        Run Speed Test
+      </button>
+    </div>
+
+    <!-- CONNECTION DETAILS CARD -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:15px;font-weight:600;color:var(--text);">Connection Details</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;">
+          <span style="color:var(--text-dim);">Effective Type</span>
+          <span style="font-weight:500;color:var(--text);" id="net-effective-type">4G / 5G</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;">
+          <span style="color:var(--text-dim);">Data Saver Mode</span>
+          <span style="font-weight:500;color:var(--text);" id="net-save-data">Disabled</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-dim);">Network Status</span>
+          <span style="font-weight:500;color:var(--text);" id="net-online-status">Connected</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <!-- BACKTRACKER -->
@@ -478,6 +563,10 @@
   <div class="more-list">
     <button class="more-list-item" onclick="showScreen('notes')">
       <span class="more-list-item-name">Notes</span>
+      <span class="more-list-item-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </button>
+    <button class="more-list-item" onclick="showScreen('netinfo')">
+      <span class="more-list-item-name">Network Info</span>
       <span class="more-list-item-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
     <button class="more-list-item" onclick="showScreen('backtracker')">
@@ -921,6 +1010,7 @@ function showScreen(name, albumId=null) {
     pictures: 'nav-pictures',
     more: 'nav-more',
     notes: 'nav-more',
+    netinfo: 'nav-more',
     backtracker: 'nav-more',
     filedrop: 'nav-more',
     imgpdf: 'nav-more',
@@ -928,18 +1018,141 @@ function showScreen(name, albumId=null) {
   };
   if (navMap[name]) document.getElementById(navMap[name]).classList.add('active');
 
-  const hideNav = ['album-detail', 'upload', 'note-detail', 'backtracker', 'filedrop', 'imgpdf', 'qr', 'notes'];
+  const hideNav = ['album-detail', 'upload', 'note-detail', 'backtracker', 'filedrop', 'imgpdf', 'qr', 'notes', 'netinfo'];
   document.querySelector('.bottom-nav').style.display = hideNav.includes(name) ? 'none' : '';
 
   if (name==='home') updateHomeStorage();
   if (name==='pictures') renderAlbums();
   if (name==='notes') renderNotes();
+  if (name==='netinfo') initNetInfo();
   if (name==='upload') initUploadScreen();
   if (name==='backtracker') initMap();
   if (name==='filedrop') initFileDrop();
   if (name==='imgpdf') initImgPdf();
   if (name==='qr') initQr();
   if (name==='album-detail' && albumId!==null) openAlbum(albumId);
+}
+
+// ══════════════════════════════════════
+//  NETWORK INFO & SPEED MONITOR
+// ══════════════════════════════════════
+let netInfoInited = false;
+
+function initNetInfo() {
+  refreshNetInfo();
+  if (!netInfoInited) {
+    netInfoInited = true;
+    window.addEventListener('online', refreshNetInfo);
+    window.addEventListener('offline', refreshNetInfo);
+
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn) {
+      conn.addEventListener('change', refreshNetInfo);
+    }
+  }
+}
+
+function refreshNetInfo() {
+  const isOnline = navigator.onLine;
+  const chip = document.getElementById('net-state-chip');
+  const title = document.getElementById('net-type-title');
+  const sub = document.getElementById('net-status-sub');
+  const badge = document.getElementById('net-status-badge');
+  const downlinkEl = document.getElementById('net-downlink');
+  const rttEl = document.getElementById('net-rtt');
+  const effEl = document.getElementById('net-effective-type');
+  const saveEl = document.getElementById('net-save-data');
+  const onlineEl = document.getElementById('net-online-status');
+
+  if (chip) {
+    chip.textContent = isOnline ? 'ONLINE' : 'OFFLINE';
+    chip.style.background = isOnline ? 'rgba(74,255,138,0.15)' : 'rgba(255,74,74,0.15)';
+    chip.style.color = isOnline ? 'var(--green)' : 'var(--danger)';
+  }
+
+  if (badge) {
+    badge.style.background = isOnline ? 'rgba(74,255,138,0.15)' : 'rgba(255,74,74,0.15)';
+    badge.style.color = isOnline ? 'var(--green)' : 'var(--danger)';
+  }
+
+  if (onlineEl) onlineEl.textContent = isOnline ? 'Connected to Internet' : 'Disconnected';
+
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+
+  if (conn) {
+    const effType = (conn.effectiveType || '4g').toUpperCase();
+    const type = conn.type ? conn.type.toUpperCase() : '';
+    
+    if (title) {
+      if (type) title.textContent = `${type} (${effType})`;
+      else title.textContent = `${effType} Connection`;
+    }
+
+    if (sub) {
+      if (effType === '4G' || effType === '5G') sub.textContent = 'High-speed mobile / broadband signal';
+      else if (effType === '3G') sub.textContent = '3G Mobile Signal';
+      else sub.textContent = 'Low-speed connection';
+    }
+
+    if (downlinkEl) downlinkEl.textContent = conn.downlink ? `${conn.downlink} Mbps` : 'N/A';
+    if (rttEl) rttEl.textContent = conn.rtt ? `${conn.rtt} ms` : 'N/A';
+    if (effEl) effEl.textContent = `${effType}${type ? ' · ' + type : ''}`;
+    if (saveEl) saveEl.textContent = conn.saveData ? 'Enabled (Saving Data)' : 'Disabled';
+  } else {
+    if (title) title.textContent = isOnline ? 'Connected' : 'Offline';
+    if (sub) sub.textContent = 'Standard network connection';
+    if (downlinkEl) downlinkEl.textContent = isOnline ? 'Active' : '0 Mbps';
+    if (rttEl) rttEl.textContent = isOnline ? 'Low' : 'N/A';
+    if (effEl) effEl.textContent = isOnline ? 'Cellular / Wi-Fi' : 'Offline';
+    if (saveEl) saveEl.textContent = 'Disabled';
+  }
+}
+
+async function runSpeedTest() {
+  const btn = document.getElementById('net-speed-btn');
+  const dlVal = document.getElementById('speed-download-val');
+  const pingVal = document.getElementById('speed-ping-val');
+
+  if (!navigator.onLine) {
+    showToast('Offline — check connection');
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Testing Speed...'; }
+  if (dlVal) dlVal.textContent = '...';
+  if (pingVal) pingVal.textContent = '...';
+
+  try {
+    const startPing = performance.now();
+    await fetch('./index.html?ping=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
+    const pingMs = Math.round(performance.now() - startPing);
+    if (pingVal) pingVal.textContent = `${pingMs} ms`;
+
+    const startDl = performance.now();
+    const res = await fetch('./index.html?speed=' + Date.now(), { method: 'GET', cache: 'no-store' });
+    const blob = await res.blob();
+    const endDl = performance.now();
+
+    const durationSec = Math.max(0.01, (endDl - startDl) / 1000);
+    const bitsLoaded = blob.size * 8;
+    const speedBps = bitsLoaded / durationSec;
+    const speedMbps = (speedBps / (1000 * 1000)).toFixed(2);
+    const speedKbps = (speedBps / 1000).toFixed(0);
+
+    if (dlVal) {
+      if (parseFloat(speedMbps) >= 1) dlVal.textContent = `${speedMbps} Mbps`;
+      else dlVal.textContent = `${speedKbps} Kbps`;
+    }
+
+    showToast('Speed check complete!');
+  } catch(err) {
+    console.error('Speed test error:', err);
+    if (dlVal) dlVal.textContent = 'Error';
+    if (pingVal) pingVal.textContent = 'Error';
+    showToast('Speed check failed');
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Run Speed Test'; }
 }
 
 // ══════════════════════════════════════

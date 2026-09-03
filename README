@@ -8,6 +8,11 @@ Files:
 - icon.png: App icon (512×512)
 
 Features:
+Home
+- Displays "CatNon Helper" blue title and app tagline
+- Calculates current storage usage via navigator.storage.estimate() and IndexedDB
+- Displays breakdown for stored photos and notes size/count
+
 Gallery
 - Organize photos into named albums
 - Upload multiple photos at once (tap or drag & drop)
@@ -18,19 +23,24 @@ Gallery
 - Tap any photo to open a full-screen lightbox
 - Delete or move photos from the lightbox options menu
 
-Notes
+Notes (accessed via More screen)
 - Create and edit rich-text notes
-- Formatting toolbar: Undo/Redo, Bold, Italic, Underline, Strikethrough, font size (S/M/L/H), text color, and clear formatting
+- Formatting toolbar: Undo/Redo, Bold, Italic, Underline, Strikethrough, font size (S/M/L/H), and text colors
 - Notes auto-save while typing (800ms debounce)
 - Rename or delete notes from the gear icon on each card
 - Notes are sorted by last modified date
+
+Network Info
+- Displays current connection status, signal effective type (4G, 5G, 3G, 2G, Wi-Fi)
+- Displays estimated downlink speed (Mbps), RTT latency (ms), and Data Saver state
+- Interactive speed check tool to test live download throughput and ping response time
 
 Backtracker
 - Records your GPS path as a polyline on a live map (OpenStreetMap)
 - Start / Stop tracking with one button
 - Snap-to-location button recenters the map on your current position
-- Reset button (circular, below compass) clears the recorded path
-- Compass overlay shows device heading (requires device orientation permission on iOS)
+- Reset button clears the recorded path
+- Compass overlay shows device heading
 
 FileDrop
 - Send files directly between two devices peer-to-peer (no server, no account)
@@ -38,16 +48,13 @@ FileDrop
 - Progress bar on both sender and receiver
 - Works across WiFi and mobile data; both devices on the same WiFi may route locally
 - Recommended max file size: 100 MB
-- Requires an internet connection for the initial handshake (PeerJS signaling), after which transfer is peer-to-peer
 
 Image to PDF
-- Convert any images straight into a PDF file format
-- Works with any amount of images as long as it does not hit the file size limit
-- Can not rotate images
+- Convert images into PDF format (works both online via jsPDF and 100% offline with native builder)
+- Preview and rotate images before exporting
 
 QR Code Generator
-- Creates a QR code to any link pasted, on scanned it will bring the user to the link pasted
-- Uses QR Code Generator plugin so no payment required.
+- Generates QR codes for links or text offline with single-tap PNG download
 
 Data Storage
 All data is stored in the browser's **IndexedDB** under the database `CatNonHelperDB`. Nothing is sent to any server.
