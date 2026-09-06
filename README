@@ -51,7 +51,8 @@ FileDrop
 
 Image to PDF
 - Convert images into PDF format (works both online via jsPDF and 100% offline with native builder)
-- Preview and rotate images before exporting
+- Reorder pages via direct page number inputs or Up/Down move buttons
+- Reorder Gallery Modal view to inspect rotated pages and adjust sequence before exporting
 
 QR Code Generator
 - Generates QR codes for links or text offline with single-tap PNG download
